@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AQL Sampling Dashboard - Universal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #222633;
+  --border: #2d3148;
+  --text: #e8eaf0;
+  --text2: #8b90a5;
+  --accent: #6c7cff;
+  --accent2: #4dd4ac;
+  --accept: #22c55e;
+  --reject: #ef4444;
+  --warn: #f59e0b;
+  --r: 10px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logo-text span {
+  color: var(--text2);
+  font-weight: 400;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.standard-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* LAYOUT */
+.app {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  min-height: calc(100vh - 69px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* FORM */
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.field select,
+.field input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.field select:hover,
+.field input:hover {
+  border-color: var(--accent);
+}
+
+.field select:focus,
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108,124,255,0.15);
+}
+
+.field select option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* BUTTONS */
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(108,124,255,0.35);
+}
+
+.btn-ghost {
+  background: var(--bg);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--text2);
+  color: var(--text);
+}
+
+/* RESULT CARDS */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.stat-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* DECISION */
+.decision {
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.3s;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+}
+
+.decision.accept {
+  background: rgba(34,197,94,0.1);
+  border-color: var(--accept);
+  color: var(--accept);
+}
+
+.decision.reject {
+  background: rgba(239,68,68,0.1);
+  border-color: var(--reject);
+  color: var(--reject);
+}
+
+.decision.pending {
+  background: rgba(245,158,11,0.08);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.decision-sub {
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* MAIN */
+.main {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 8px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text2);
+  background: transparent;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* TABLE */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.table-subtitle {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead {
+  background: var(--surface2);
+}
+
+th {
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th:first-child {
+  text-align: left;
+  padding-left: 20px;
+}
+
+td {
+  padding: 10px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+
+td:first-child {
+  text-align: left;
+  padding-left: 20px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+tr:hover td {
+  background: rgba(108,124,255,0.04);
+}
+
+tr.highlight td {
+  background: rgba(108,124,255,0.1);
+  border-top: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+
+/* PRESETS */
+.presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.preset {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.preset:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.preset-name {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.preset-desc {
+  font-size: 10px;
+  color: var(--text2);
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.success {
+  background: rgba(34,197,94,0.15);
+  border: 1px solid var(--accept);
+  color: var(--accept);
+}
+
+.toast.error {
+  background: rgba(239,68,68,0.15);
+  border: 1px solid var(--reject);
+  color: var(--reject);
+}
+
+/* 100% INSPECTION WARNING */
+.full-inspect {
+  background: rgba(245,158,11,0.1);
+  border: 1px solid var(--warn);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--warn);
+  display: none;
+  margin-top: 8px;
+}
+
+.full-inspect.show {
+  display: block;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .topbar {
+    padding: 12px 16px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">AQ</div>
+    <div class="logo-text">AQL Dashboard <span>Universal Sampling</span></div>
+  </div>
+  <div class="standard-badge">ANSI/ASQ Z1.4 &middot; ISO 2859-1</div>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- QUICK PRESETS -->
+    <div class="panel">
+      <div class="panel-title">Quick Presets</div>
+      <div class="presets">
+        <div class="preset" onclick="applyPreset('food')">
+          <div class="preset-name">🍱 Food / Pharma</div>
+          <div class="preset-desc">AQL 0.065 (Critical)</div>
+        </div>
+        <div class="preset" onclick="applyPreset('auto')">
+          <div class="preset-name">🚗 Automotive</div>
+          <div class="preset-desc">AQL 0.25 (Strict)</div>
+        </div>
+        <div class="preset" onclick="applyPreset('consumer')">
+          <div class="preset-name">📦 Consumer</div>
+          <div class="preset-desc">AQL 1.0 (General)</div>
+        </div>
+        <div class="preset" onclick="applyPreset('cosmetic')">
+          <div class="preset-name">👁️ Cosmetic Only</div>
+          <div class="preset-desc">AQL 4.0 (Visual)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="panel">
+      <div class="panel-title">Inspection Setup</div>
+
+      <div class="field">
+        <label>AQL Level</label>
+        <select id="aqlLevel">
+          <option value="">-- Select AQL --</option>
+          <option value="0.065">0.065 — Zero tolerance (Food/Pharma/Safety)</option>
+          <option value="0.10">0.10 — Near zero (Medical device)</option>
+          <option value="0.15">0.15 — Ultra strict (Precision parts)</option>
+          <option value="0.25">0.25 — Very strict (Automotive/Aerospace)</option>
+          <option value="0.40">0.40 — Strict (Electronics/Plastic)</option>
+          <option value="0.65">0.65 — Standard (General manufacturing)</option>
+          <option value="1.0">1.0 — Normal (Consumer goods)</option>
+          <option value="1.5">1.5 — Moderate (Textile/Garment)</option>
+          <option value="2.5">2.5 — Relaxed (Minor/Cosmetic defects)</option>
+          <option value="4.0">4.0 — Loose (Visual only)</option>
+          <option value="6.5">6.5 — Very loose (Bulk/Non-critical)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Inspection Level</label>
+        <select id="inspLevel">
+          <option value="S1">S-1 (Special - Smallest sample)</option>
+          <option value="S2">S-2 (Special)</option>
+          <option value="S3">S-3 (Special)</option>
+          <option value="S4">S-4 (Special)</option>
+          <option value="I">Level I (Reduced)</option>
+          <option value="II" selected>Level II (Normal) ★</option>
+          <option value="III">Level III (Tightened)</option>
+        </select>
+        <div class="field-hint">Level II = มาตรฐานทั่วไป</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Lot Size (จำนวนลอต)</label>
+          <input type="number" id="lotSize" placeholder="เช่น 1000" min="2">
+        </div>
+        <div class="field">
+          <label>Defects Found</label>
+          <input type="number" id="defects" placeholder="0" min="0" value="0">
+        </div>
+      </div>
+
+      <div class="full-inspect" id="fullInspect">
+        ⚠️ Sample Size ≥ Lot Size → ต้องตรวจ 100% ทั้งลอต
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+        <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="panel">
+      <div class="panel-title">Result</div>
+
+      <div class="result-grid">
+        <div class="stat-card" id="cardSS">
+          <div class="stat-label">Sample</div>
+          <div class="stat-value" id="resSS">—</div>
+        </div>
+        <div class="stat-card" id="cardAc">
+          <div class="stat-label">Accept</div>
+          <div class="stat-value" id="resAc">—</div>
+        </div>
+        <div class="stat-card" id="cardRe">
+          <div class="stat-label">Reject</div>
+          <div class="stat-value" id="resRe">—</div>
+        </div>
+      </div>
+
+      <div class="decision pending" id="decision">
+        ⏳ Waiting for input
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="tabs" id="tabBar">
+      <button class="tab active" onclick="switchTab('full')">Full Reference</button>
+      <button class="tab" onclick="switchTab('custom')">Your AQL</button>
+      <button class="tab" onclick="switchTab('guide')">Quick Guide</button>
+    </div>
+
+    <!-- FULL TABLE -->
+    <div class="table-wrap" id="tabFull">
+      <div class="table-header">
+        <div>
+          <div class="table-title">ANSI/ASQ Z1.4 — Level II Normal Inspection</div>
+          <div class="table-subtitle">Sample Size / Ac / Re — All AQL levels</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Lot Size</th>
+              <th>0.065</th>
+              <th>0.10</th>
+              <th>0.15</th>
+              <th>0.25</th>
+              <th>0.40</th>
+              <th>0.65</th>
+              <th>1.0</th>
+              <th>1.5</th>
+              <th>2.5</th>
+              <th>4.0</th>
+              <th>6.5</th>
+            </tr>
+          </thead>
+          <tbody id="fullBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOM TABLE -->
+    <div class="table-wrap" id="tabCustom" style="display:none;">
+      <div class="table-header">
+        <div>
+          <div class="table-title" id="customTitle">Select an AQL to view table</div>
+          <div class="table-subtitle">Sample Size / Accept / Reject per Lot Range</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Lot Size Range</th>
+              <th>Sample Size</th>
+              <th>Accept (Ac)</th>
+              <th>Reject (Re)</th>
+            </tr>
+          </thead>
+          <tbody id="customBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div class="table-wrap" id="tabGuide" style="display:none;">
+      <div class="table-header">
+        <div>
+          <div class="table-title">AQL Quick Guide — Industry Reference</div>
+          <div class="table-subtitle">Recommended AQL levels by industry and defect type</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Industry</th>
+              <th>Critical Defect</th>
+              <th>Major Defect</th>
+              <th>Minor Defect</th>
+              <th>Inspection Level</th>
+            </tr>
+          </thead>
+          <tbody id="guideBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ Z1.4 CODE LETTER TABLE ============
+const codeLetter = {
+  //          S1  S2  S3  S4   I   II  III
+  "2-8":    ["A","A","A","A","A","A","B"],
+  "9-15":   ["A","A","A","A","A","B","C"],
+  "16-25":  ["A","A","B","B","B","C","D"],
+  "26-50":  ["A","B","B","C","C","D","E"],
+  "51-90":  ["B","B","C","C","C","E","F"],
+  "91-150": ["B","B","C","D","D","F","G"],
+  "151-280":["B","C","D","E","E","G","H"],
+  "281-500":["B","C","D","E","F","H","J"],
+  "501-1200":["C","C","E","F","G","J","K"],
+  "1201-3200":["C","D","E","G","H","K","L"],
+  "3201-10000":["C","D","F","G","J","L","M"],
+  "10001-35000":["C","D","F","H","K","M","N"],
+  "35001-150000":["D","E","G","J","L","N","P"],
+  "150001-500000":["D","E","G","J","M","P","Q"],
+  "500001+":["D","E","H","K","N","Q","R"]
+};
+
+// ============ SAMPLE SIZE PER CODE LETTER ============
+const sampleSizes = {
+  A:2, B:3, C:5, D:8, E:13, F:20, G:32, H:50, J:80, K:125, L:200, M:315, N:500, P:800, Q:1250, R:2000
+};
+const codeOrder = ["A","B","C","D","E","F","G","H","J","K","L","M","N","P","Q","R"];
+
+// ============ Ac/Re TABLE (Normal Inspection) ============
+// key = code letter, value = { aql: [Ac, Re] }
+// ↓ means use next code letter down (larger sample)
+// Generated from ANSI/ASQ Z1.4 Table II-A
+const acReTable = {
+  A: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[null],"2.5":[0,1],"4.0":[0,1],"6.5":[0,1]},
+  B: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[0,1],"2.5":[0,1],"4.0":[0,1],"6.5":[1,2]},
+  C: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[0,1],"1.5":[0,1],"2.5":[0,1],"4.0":[1,2],"6.5":[2,3]},
+  D: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[0,1],"1.0":[0,1],"1.5":[0,1],"2.5":[1,2],"4.0":[2,3],"6.5":[3,4]},
+  E: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[0,1],"0.65":[0,1],"1.0":[0,1],"1.5":[1,2],"2.5":[2,3],"4.0":[3,4],"6.5":[5,6]},
+  F: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[0,1],"0.40":[0,1],"0.65":[0,1],"1.0":[1,2],"1.5":[2,3],"2.5":[3,4],"4.0":[5,6],"6.5":[7,8]},
+  G: {"0.065":[null],"0.10":[null],"0.15":[0,1],"0.25":[0,1],"0.40":[0,1],"0.65":[1,2],"1.0":[2,3],"1.5":[3,4],"2.5":[5,6],"4.0":[7,8],"6.5":[10,11]},
+  H: {"0.065":[null],"0.10":[0,1],"0.15":[0,1],"0.25":[0,1],"0.40":[1,2],"0.65":[2,3],"1.0":[3,4],"1.5":[5,6],"2.5":[7,8],"4.0":[10,11],"6.5":[14,15]},
+  J: {"0.065":[0,1],"0.10":[0,1],"0.15":[0,1],"0.25":[1,2],"0.40":[1,2],"0.65":[3,4],"1.0":[5,6],"1.5":[7,8],"2.5":[10,11],"4.0":[14,15],"6.5":[21,22]},
+  K: {"0.065":[0,1],"0.10":[0,1],"0.15":[1,2],"0.25":[1,2],"0.40":[2,3],"0.65":[5,6],"1.0":[7,8],"1.5":[10,11],"2.5":[14,15],"4.0":[21,22],"6.5":[21,22]},
+  L: {"0.065":[0,1],"0.10":[1,2],"0.15":[1,2],"0.25":[2,3],"0.40":[3,4],"0.65":[7,8],"1.0":[10,11],"1.5":[14,15],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
+  M: {"0.065":[1,2],"0.10":[1,2],"0.15":[2,3],"0.25":[3,4],"0.40":[5,6],"0.65":[10,11],"1.0":[14,15],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
+  N: {"0.065":[1,2],"0.10":[2,3],"0.15":[3,4],"0.25":[5,6],"0.40":[7,8],"0.65":[14,15],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
+  P: {"0.065":[2,3],"0.10":[3,4],"0.15":[5,6],"0.25":[7,8],"0.40":[10,11],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
+  Q: {"0.065":[3,4],"0.10":[5,6],"0.15":[7,8],"0.25":[10,11],"0.40":[14,15],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
+  R: {"0.065":[5,6],"0.10":[7,8],"0.15":[10,11],"0.25":[14,15],"0.40":[21,22],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]}
+};
+
+const inspLevelIndex = { S1:0, S2:1, S3:2, S4:3, I:4, II:5, III:6 };
+const aqlLevels = ["0.065","0.10","0.15","0.25","0.40","0.65","1.0","1.5","2.5","4.0","6.5"];
+const lotRanges = ["2-8","9-15","16-25","26-50","51-90","91-150","151-280","281-500","501-1200","1201-3200","3201-10000","10001-35000","35001-150000","150001-500000","500001+"];
+
+// ============ RESOLVE ARROW ============
+function resolveAcRe(startCode, aql) {
+  let idx = codeOrder.indexOf(startCode);
+  while (idx < codeOrder.length) {
+    const code = codeOrder[idx];
+    const val = acReTable[code][aql];
+    if (val && val[0] !== null) {
+      return { ss: sampleSizes[code], ac: val[0], re: val[1], resolvedCode: code };
+    }
+    idx++;
+  }
+  return null;
+}
+
+// ============ GET LOT RANGE ============
+function getLotRange(n) {
+  if (n>=2 && n<=8) return "2-8";
+  if (n>=9 && n<=15) return "9-15";
+  if (n>=16 && n<=25) return "16-25";
+  if (n>=26 && n<=50) return "26-50";
+  if (n>=51 && n<=90) return "51-90";
+  if (n>=91 && n<=150) return "91-150";
+  if (n>=151 && n<=280) return "151-280";
+  if (n>=281 && n<=500) return "281-500";
+  if (n>=501 && n<=1200) return "501-1200";
+  if (n>=1201 && n<=3200) return "1201-3200";
+  if (n>=3201 && n<=10000) return "3201-10000";
+  if (n>=10001 && n<=35000) return "10001-35000";
+  if (n>=35001 && n<=150000) return "35001-150000";
+  if (n>=150001 && n<=500000) return "150001-500000";
+  if (n>=500001) return "500001+";
+  return null;
+}
+
+// ============ CALCULATE ============
+function calculate() {
+  const aql = document.getElementById("aqlLevel").value;
+  const level = document.getElementById("inspLevel").value;
+  const lotStr = document.getElementById("lotSize").value.trim();
+  const defStr = document.getElementById("defects").value.trim();
+
+  if (!aql) return toast("Select an AQL level","error");
+  if (!lotStr) return toast("Enter Lot Size","error");
+
+  const lot = parseInt(lotStr);
+  if (isNaN(lot) || lot < 2) return toast("Lot Size must be ≥ 2","error");
+
+  const defects = parseInt(defStr) || 0;
+  const lotRange = getLotRange(lot);
+  if (!lotRange) return toast("Lot Size out of range","error");
+
+  const levelIdx = inspLevelIndex[level];
+  const startCode = codeLetter[lotRange][levelIdx];
+  const result = resolveAcRe(startCode, aql);
+
+  if (!result) return toast("No sampling plan for this combination","error");
+
+  const { ss, ac, re } = result;
+
+  // Check 100% inspection
+  const fi = document.getElementById("fullInspect");
+  if (ss >= lot) {
+    fi.classList.add("show");
+  } else {
+    fi.classList.remove("show");
+  }
+
+  // Display
+  document.getElementById("resSS").textContent = ss >= lot ? lot + " (100%)" : ss;
+  document.getElementById("resAc").textContent = ac;
+  document.getElementById("resRe").textContent = re;
+
+  document.querySelectorAll(".stat-card").forEach(c => c.classList.add("active"));
+
+  // Decision
+  const dec = document.getElementById("decision");
+  if (defects <= ac) {
+    dec.className = "decision accept";
+    dec.innerHTML = `✅ ACCEPT<div class="decision-sub">Defects ${defects} ≤ Ac ${ac}</div>`;
+  } else if (defects >= re) {
+    dec.className = "decision reject";
+    dec.innerHTML = `❌ REJECT<div class="decision-sub">Defects ${defects} ≥ Re ${re}</div>`;
+  } else {
+    dec.className = "decision pending";
+    dec.innerHTML = `⚠️ BETWEEN<div class="decision-sub">${ac} < Defects ${defects} < ${re}</div>`;
+  }
+
+  // Highlight table row
+  highlightRow(lotRange);
+
+  // Update custom tab
+  updateCustomTable(aql, level);
+
+  toast(`Calculated: Lot ${lot} → Sample ${ss}, Ac ${ac}, Re ${re}`,"success");
+}
+
+function highlightRow(range) {
+  document.querySelectorAll("tr.highlight").forEach(r => r.classList.remove("highlight"));
+  const rows = document.querySelectorAll("#fullBody tr, #customBody tr");
+  rows.forEach(r => {
+    if (r.cells[0] && r.cells[0].textContent === range) r.classList.add("highlight");
+  });
+}
+
+// ============ PRESETS ============
+function applyPreset(type) {
+  const map = {
+    food: { aql:"0.065", level:"II" },
+    auto: { aql:"0.25", level:"II" },
+    consumer: { aql:"1.0", level:"II" },
+    cosmetic: { aql:"4.0", level:"I" }
+  };
+  const p = map[type];
+  document.getElementById("aqlLevel").value = p.aql;
+  document.getElementById("inspLevel").value = p.level;
+  toast(`Preset applied: ${type.toUpperCase()}`,"success");
+}
+
+// ============ TABS ============
+function switchTab(tab) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
+  document.getElementById("tabFull").style.display = tab === "full" ? "block" : "none";
+  document.getElementById("tabCustom").style.display = tab === "custom" ? "block" : "none";
+  document.getElementById("tabGuide").style.display = tab === "guide" ? "block" : "none";
+}
+
+// ============ RENDER TABLES ============
+function renderFullTable() {
+  const tbody = document.getElementById("fullBody");
+  tbody.innerHTML = "";
+
+  lotRanges.forEach(range => {
+    const tr = document.createElement("tr");
+    let html = `<td>${range}</td>`;
+
+    aqlLevels.forEach(aql => {
+      const code = codeLetter[range][5]; // Level II
+      const result = resolveAcRe(code, aql);
+      if (result) {
+        html += `<td>${result.ss}/${result.ac}/${result.re}</td>`;
+      } else {
+        html += `<td style="color:var(--text2)">—</td>`;
+      }
+    });
+
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateCustomTable(aql, level) {
+  const tbody = document.getElementById("customBody");
+  tbody.innerHTML = "";
+  document.getElementById("customTitle").textContent = `AQL ${aql} — ${level}`;
+
+  const levelIdx = inspLevelIndex[level];
+
+  lotRanges.forEach(range => {
+    const code = codeLetter[range][levelIdx];
+    const result = resolveAcRe(code, aql);
+    const tr = document.createElement("tr");
+
+    if (result) {
+      tr.innerHTML = `<td>${range}</td><td>${result.ss}</td><td>${result.ac}</td><td>${result.re}</td>`;
+    } else {
+      tr.innerHTML = `<td>${range}</td><td colspan="3" style="color:var(--text2)">—</td>`;
+    }
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderGuideTable() {
+  const tbody = document.getElementById("guideBody");
+  const data = [
+    ["🍱 Food & Beverage","0.065 (C=0)","0.40","2.5","Level II"],
+    ["💊 Pharmaceutical","0.065 (C=0)","0.25","1.0","Level II"],
+    ["🏥 Medical Device","0.065 (C=0)","0.25","1.0","Level II"],
+    ["🚗 Automotive (OEM)","0.065 (C=0)","0.25","1.0","Level II"],
+    ["✈️ Aerospace & Defense","0.065 (C=0)","0.10","0.65","Level III"],
+    ["📱 Electronics","0.065 (C=0)","0.40","2.5","Level II"],
+    ["🧴 Cosmetics","0.065 (C=0)","0.65","2.5","Level II"],
+    ["👕 Textile / Garment","0.065 (C=0)","1.0","2.5","Level II"],
+    ["🧱 Plastic Injection","0.065 (C=0)","0.40","2.5","Level II"],
+    ["🔩 Metal / Hardware","0.065 (C=0)","0.65","2.5","Level II"],
+    ["📦 General Consumer","0.065 (C=0)","1.0","4.0","Level II"],
+    ["🪵 Furniture / Wood","0.065 (C=0)","1.5","4.0","Level I"],
+    ["🎁 Toys / Gifts","0.065 (C=0)","1.0","4.0","Level II"],
+    ["🏗️ Construction Material","0.065 (C=0)","1.0","2.5","Level II"],
+    ["🧪 Chemical / Paint","0.065 (C=0)","0.65","2.5","Level II"],
+  ];
+
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = row.map((c,i) => i===0 ? `<td style="text-align:left;padding-left:20px;font-weight:600;">${c}</td>` : `<td>${c}</td>`).join("");
+    tbody.appendChild(tr);
+  });
+}
+
+// ============ CLEAR ============
+function clearAll() {
+  document.getElementById("aqlLevel").value = "";
+  document.getElementById("inspLevel").value = "II";
+  document.getElementById("lotSize").value = "";
+  document.getElementById("defects").value = "0";
+  document.getElementById("resSS").textContent = "—";
+  document.getElementById("resAc").textContent = "—";
+  document.getElementById("resRe").textContent = "—";
+  document.getElementById("decision").className = "decision pending";
+  document.getElementById("decision").innerHTML = "⏳ Waiting for input";
+  document.getElementById("fullInspect").classList.remove("show");
+  document.querySelectorAll(".stat-card").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll("tr.highlight").forEach(r => r.classList.remove("highlight"));
+}
+
+// ============ TOAST ============
+function toast(msg, type) {
+  const t = document.getElementById("toast");
+  t.textContent = (type === "success" ? "✅ " : "❌ ") + msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ============ ENTER KEY ============
+document.getElementById("lotSize").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
+document.getElementById("defects").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
+
+// ============ INIT ============
+window.addEventListener("load", () => {
+  renderFullTable();
+  renderGuideTable();
+});
+</script>
+</body>
+</html>
