@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AQL Sampling Dashboard - Universal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root {
   --bg: #0f1117;
@@ -30,7 +31,6 @@ body {
   min-height: 100vh;
 }
 
-/* HEADER */
 .topbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -86,14 +86,12 @@ body {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* LAYOUT */
 .app {
   display: grid;
   grid-template-columns: 380px 1fr;
   min-height: calc(100vh - 69px);
 }
 
-/* SIDEBAR */
 .sidebar {
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -131,7 +129,6 @@ body {
   border-radius: 2px;
 }
 
-/* FORM */
 .field {
   margin-bottom: 16px;
 }
@@ -180,13 +177,38 @@ body {
   gap: 12px;
 }
 
-.field-hint {
-  font-size: 11px;
-  color: var(--text2);
-  margin-top: 4px;
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-/* BUTTONS */
+.preset-btn {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.preset-btn:hover {
+  border-color: var(--accent);
+  background: rgba(108,124,255,0.1);
+}
+
+.preset-label {
+  font-size: 10px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
 .btn-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -230,7 +252,21 @@ body {
   color: var(--text);
 }
 
-/* RESULT CARDS */
+.btn-success {
+  background: linear-gradient(135deg, var(--accent2), #10b981);
+  color: #fff;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(77,212,172,0.35);
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
 .result-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -268,7 +304,6 @@ body {
   color: var(--accent);
 }
 
-/* DECISION */
 .decision {
   border-radius: 8px;
   padding: 16px;
@@ -306,7 +341,6 @@ body {
   opacity: 0.8;
 }
 
-/* MAIN */
 .main {
   padding: 24px;
   overflow-y: auto;
@@ -315,7 +349,6 @@ body {
   gap: 24px;
 }
 
-/* TABS */
 .tabs {
   display: flex;
   gap: 4px;
@@ -348,7 +381,6 @@ body {
   color: #fff;
 }
 
-/* TABLE */
 .table-wrap {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -420,46 +452,58 @@ tr:hover td {
   background: rgba(108,124,255,0.04);
 }
 
-tr.highlight td {
-  background: rgba(108,124,255,0.1);
-  border-top: 1px solid var(--accent);
-  border-bottom: 1px solid var(--accent);
-}
-
-/* PRESETS */
-.presets {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.preset {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.preset:hover {
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-.preset-name {
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 12px;
+  margin-top: 12px;
+}
+
+.history-table thead {
+  background: var(--surface2);
+}
+
+.history-table th {
+  padding: 10px;
+  text-align: left;
+  font-size: 11px;
   font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.preset-desc {
-  font-size: 10px;
   color: var(--text2);
+  border-bottom: 1px solid var(--border);
 }
 
-/* TOAST */
+.history-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-table tr:hover {
+  background: rgba(108,124,255,0.04);
+}
+
+.action-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.action-btn:hover {
+  background: #8b5cf6;
+}
+
+.action-btn-delete {
+  background: var(--reject);
+}
+
+.action-btn-delete:hover {
+  background: #dc2626;
+}
+
 .toast {
   position: fixed;
   bottom: 24px;
@@ -494,7 +538,6 @@ tr.highlight td {
   color: var(--reject);
 }
 
-/* 100% INSPECTION WARNING */
 .full-inspect {
   background: rgba(245,158,11,0.1);
   border: 1px solid var(--warn);
@@ -510,7 +553,83 @@ tr.highlight td {
   display: block;
 }
 
-/* RESPONSIVE */
+/* PDF STYLES */
+.pdf-container {
+  display: none;
+  width: 210mm;
+  height: 297mm;
+  background: white;
+  color: black;
+  font-family: 'Sarabun', serif;
+  padding: 15mm;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pdf-container.show {
+  display: block;
+}
+
+.pdf-section {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #003366;
+}
+
+.pdf-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #003366;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.pdf-subtitle {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pdf-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.pdf-label {
+  width: 45%;
+  font-weight: bold;
+  padding-right: 10px;
+}
+
+.pdf-value {
+  width: 55%;
+}
+
+.pdf-decision {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.pdf-decision.accept {
+  background-color: #22c55e;
+  color: white;
+}
+
+.pdf-decision.reject {
+  background-color: #ef4444;
+  color: white;
+}
+
+.pdf-decision.pending {
+  background-color: #f59e0b;
+  color: white;
+}
+
 @media (max-width: 900px) {
   .app {
     grid-template-columns: 1fr;
@@ -518,9 +637,6 @@ tr.highlight td {
   .sidebar {
     border-right: none;
     border-bottom: 1px solid var(--border);
-  }
-  .result-grid {
-    grid-template-columns: 1fr 1fr 1fr;
   }
   .topbar {
     padding: 12px 16px;
@@ -535,37 +651,41 @@ tr.highlight td {
     <div class="logo-icon">AQ</div>
     <div class="logo-text">AQL Dashboard <span>Universal Sampling</span></div>
   </div>
-  <div class="standard-badge">ANSI/ASQ Z1.4 &middot; ISO 2859-1</div>
+  <div class="standard-badge">ANSI/ASQ Z1.4 · ISO 2859-1</div>
 </div>
 
 <div class="app">
-  <!-- SIDEBAR -->
   <div class="sidebar">
 
-    <!-- QUICK PRESETS -->
     <div class="panel">
-      <div class="panel-title">Quick Presets</div>
-      <div class="presets">
-        <div class="preset" onclick="applyPreset('food')">
-          <div class="preset-name">🍱 Food / Pharma</div>
-          <div class="preset-desc">AQL 0.065 (Critical)</div>
-        </div>
-        <div class="preset" onclick="applyPreset('auto')">
-          <div class="preset-name">🚗 Automotive</div>
-          <div class="preset-desc">AQL 0.25 (Strict)</div>
-        </div>
-        <div class="preset" onclick="applyPreset('consumer')">
-          <div class="preset-name">📦 Consumer</div>
-          <div class="preset-desc">AQL 1.0 (General)</div>
-        </div>
-        <div class="preset" onclick="applyPreset('cosmetic')">
-          <div class="preset-name">👁️ Cosmetic Only</div>
-          <div class="preset-desc">AQL 4.0 (Visual)</div>
-        </div>
+      <div class="panel-title">Company Info</div>
+
+      <div class="field">
+        <label>Company Name</label>
+        <input type="text" id="companyName" placeholder="บริษัท สาลี่อุตสาหกรรม" value="บริษัท สาลี่อุตสาหกรรม">
+      </div>
+
+      <div class="field">
+        <label>Inspector Name</label>
+        <input type="text" id="inspectorName" placeholder="เช่น นาย สรวิศ" value="นาย สรวิศ">
+      </div>
+
+      <div class="field">
+        <label>Department</label>
+        <input type="text" id="department" placeholder="Quality Control Department" value="Quality Control Department">
       </div>
     </div>
 
-    <!-- INPUT -->
+    <div class="panel">
+      <div class="panel-title">Quick Presets</div>
+      <div class="preset-grid">
+        <button class="preset-btn" onclick="setPreset(0.065, 'II')">🍱 Food / Pharma<div class="preset-label">AQL 0.065 (Critical)</div></button>
+        <button class="preset-btn" onclick="setPreset(0.25, 'II')">🚗 Automotive<div class="preset-label">AQL 0.25 (Strict)</div></button>
+        <button class="preset-btn" onclick="setPreset(0.40, 'II')">👕 Consumer<div class="preset-label">AQL 0.40 (General)</div></button>
+        <button class="preset-btn" onclick="setPreset(4.0, 'II')">💄 Cosmetic Only<div class="preset-label">AQL 4.0 (Visual)</div></button>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-title">Inspection Setup</div>
 
@@ -573,24 +693,24 @@ tr.highlight td {
         <label>AQL Level</label>
         <select id="aqlLevel">
           <option value="">-- Select AQL --</option>
-          <option value="0.065">0.065 — Zero tolerance (Food/Pharma/Safety)</option>
-          <option value="0.10">0.10 — Near zero (Medical device)</option>
-          <option value="0.15">0.15 — Ultra strict (Precision parts)</option>
-          <option value="0.25">0.25 — Very strict (Automotive/Aerospace)</option>
-          <option value="0.40">0.40 — Strict (Electronics/Plastic)</option>
-          <option value="0.65">0.65 — Standard (General manufacturing)</option>
-          <option value="1.0">1.0 — Normal (Consumer goods)</option>
-          <option value="1.5">1.5 — Moderate (Textile/Garment)</option>
-          <option value="2.5">2.5 — Relaxed (Minor/Cosmetic defects)</option>
-          <option value="4.0">4.0 — Loose (Visual only)</option>
-          <option value="6.5">6.5 — Very loose (Bulk/Non-critical)</option>
+          <option value="0.065">0.065 — Zero tolerance</option>
+          <option value="0.10">0.10 — Near zero</option>
+          <option value="0.15">0.15 — Ultra strict</option>
+          <option value="0.25">0.25 — Very strict</option>
+          <option value="0.40" selected>0.40 — Strict</option>
+          <option value="0.65">0.65 — Standard</option>
+          <option value="1.0">1.0 — Normal</option>
+          <option value="1.5">1.5 — Moderate</option>
+          <option value="2.5">2.5 — Relaxed</option>
+          <option value="4.0">4.0 — Loose</option>
+          <option value="6.5">6.5 — Very loose</option>
         </select>
       </div>
 
       <div class="field">
         <label>Inspection Level</label>
         <select id="inspLevel">
-          <option value="S1">S-1 (Special - Smallest sample)</option>
+          <option value="S1">S-1 (Special - Smallest)</option>
           <option value="S2">S-2 (Special)</option>
           <option value="S3">S-3 (Special)</option>
           <option value="S4">S-4 (Special)</option>
@@ -598,22 +718,26 @@ tr.highlight td {
           <option value="II" selected>Level II (Normal) ★</option>
           <option value="III">Level III (Tightened)</option>
         </select>
-        <div class="field-hint">Level II = มาตรฐานทั่วไป</div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label>Lot Size (จำนวนลอต)</label>
-          <input type="number" id="lotSize" placeholder="เช่น 1000" min="2">
+          <label>Lot Size</label>
+          <input type="number" id="lotSize" placeholder="เช่น 1000" min="2" max="999999">
         </div>
         <div class="field">
           <label>Defects Found</label>
-          <input type="number" id="defects" placeholder="0" min="0" value="0">
+          <input type="number" id="defects" placeholder="0" min="0" max="999" value="0">
         </div>
       </div>
 
+      <div class="field">
+        <label>Product Name</label>
+        <input type="text" id="productName" placeholder="PP Injection Parts">
+      </div>
+
       <div class="full-inspect" id="fullInspect">
-        ⚠️ Sample Size ≥ Lot Size → ต้องตรวจ 100% ทั้งลอต
+        ⚠️ Sample Size ≥ Lot Size → ต้องตรวจ 100%
       </div>
 
       <div class="btn-row">
@@ -622,7 +746,6 @@ tr.highlight td {
       </div>
     </div>
 
-    <!-- RESULT -->
     <div class="panel">
       <div class="panel-title">Result</div>
 
@@ -644,25 +767,32 @@ tr.highlight td {
       <div class="decision pending" id="decision">
         ⏳ Waiting for input
       </div>
+
+      <div class="btn-row" style="margin-top: 12px;">
+        <button class="btn btn-success btn-sm" onclick="saveToHistory()" id="saveBtn" style="display:none;">
+          💾 Save Result
+        </button>
+        <button class="btn btn-success btn-sm" onclick="exportPDF()" id="exportBtn" style="display:none; grid-column:auto;">
+          📥 Export PDF
+        </button>
+      </div>
     </div>
 
   </div>
 
-  <!-- MAIN -->
   <div class="main">
 
     <div class="tabs" id="tabBar">
-      <button class="tab active" onclick="switchTab('full')">Full Reference</button>
-      <button class="tab" onclick="switchTab('custom')">Your AQL</button>
-      <button class="tab" onclick="switchTab('guide')">Quick Guide</button>
+      <button class="tab active" onclick="switchTab('reference')">Reference</button>
+      <button class="tab" onclick="switchTab('history')">📋 History</button>
+      <button class="tab" onclick="switchTab('guide')">Guide</button>
     </div>
 
-    <!-- FULL TABLE -->
-    <div class="table-wrap" id="tabFull">
+    <div class="table-wrap" id="tabReference">
       <div class="table-header">
         <div>
-          <div class="table-title">ANSI/ASQ Z1.4 — Level II Normal Inspection</div>
-          <div class="table-subtitle">Sample Size / Ac / Re — All AQL levels</div>
+          <div class="table-title">ANSI/ASQ Z1.4 — Level II</div>
+          <div class="table-subtitle">All AQL levels reference table</div>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -688,35 +818,36 @@ tr.highlight td {
       </div>
     </div>
 
-    <!-- CUSTOM TABLE -->
-    <div class="table-wrap" id="tabCustom" style="display:none;">
+    <div class="table-wrap" id="tabHistory" style="display:none;">
       <div class="table-header">
         <div>
-          <div class="table-title" id="customTitle">Select an AQL to view table</div>
-          <div class="table-subtitle">Sample Size / Accept / Reject per Lot Range</div>
+          <div class="table-title">Sampling History</div>
+          <div class="table-subtitle" id="historyCount">No records yet</div>
         </div>
       </div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="history-table" id="historyTableBody">
           <thead>
             <tr>
-              <th>Lot Size Range</th>
-              <th>Sample Size</th>
-              <th>Accept (Ac)</th>
-              <th>Reject (Re)</th>
+              <th>Date/Time</th>
+              <th>Product</th>
+              <th>Lot Size</th>
+              <th>Defects</th>
+              <th>Sample</th>
+              <th>Decision</th>
+              <th>Action</th>
             </tr>
           </thead>
-          <tbody id="customBody"></tbody>
+          <tbody id="historyRows"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- GUIDE -->
     <div class="table-wrap" id="tabGuide" style="display:none;">
       <div class="table-header">
         <div>
-          <div class="table-title">AQL Quick Guide — Industry Reference</div>
-          <div class="table-subtitle">Recommended AQL levels by industry and defect type</div>
+          <div class="table-title">Industry Reference</div>
+          <div class="table-subtitle">Recommended AQL levels by industry</div>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -724,10 +855,10 @@ tr.highlight td {
           <thead>
             <tr>
               <th>Industry</th>
-              <th>Critical Defect</th>
-              <th>Major Defect</th>
-              <th>Minor Defect</th>
-              <th>Inspection Level</th>
+              <th>Critical</th>
+              <th>Major</th>
+              <th>Minor</th>
+              <th>Level</th>
             </tr>
           </thead>
           <tbody id="guideBody"></tbody>
@@ -738,39 +869,121 @@ tr.highlight td {
   </div>
 </div>
 
+<!-- PDF TEMPLATE (Hidden) -->
+<div class="pdf-container" id="pdfContent">
+  <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #003366; padding-bottom: 10px;">
+    <div style="font-size: 18px; font-weight: bold; color: #003366;" id="pdfCompanyName"></div>
+    <div style="font-size: 14px; font-weight: bold; color: #004499; margin-top: 5px;">AQL Sampling Inspection Report</div>
+    <div style="font-size: 12px; color: #666; margin-top: 3px;">ANSI/ASQ Z1.4 - ISO 2859-1:2023</div>
+  </div>
+
+  <!-- ENGLISH SECTION -->
+  <div style="margin-bottom: 30px;">
+    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px;">1. INSPECTION INFORMATION</div>
+    <table style="width: 100%; margin-bottom: 10px;">
+      <tr><td style="font-weight: bold; width: 40%;">Company:</td><td id="pdfCompanyEng"></td></tr>
+      <tr><td style="font-weight: bold;">Date:</td><td id="pdfDateEng"></td></tr>
+      <tr><td style="font-weight: bold;">Inspector:</td><td id="pdfInspectorEng"></td></tr>
+      <tr><td style="font-weight: bold;">Department:</td><td id="pdfDepartmentEng"></td></tr>
+      <tr><td style="font-weight: bold;">Product Name:</td><td id="pdfProductEng"></td></tr>
+    </table>
+
+    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">2. SAMPLING PLAN</div>
+    <table style="width: 100%; margin-bottom: 10px;">
+      <tr><td style="font-weight: bold; width: 40%;">AQL Level:</td><td id="pdfAqlEng"></td></tr>
+      <tr><td style="font-weight: bold;">Inspection Level:</td><td id="pdfLevelEng"></td></tr>
+      <tr><td style="font-weight: bold;">Lot Size:</td><td id="pdfLotEng"></td></tr>
+      <tr><td style="font-weight: bold;">Sample Size:</td><td id="pdfSampleEng"></td></tr>
+      <tr><td style="font-weight: bold;">Accept (Ac):</td><td id="pdfAcEng"></td></tr>
+      <tr><td style="font-weight: bold;">Reject (Re):</td><td id="pdfReEng"></td></tr>
+    </table>
+
+    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">3. INSPECTION RESULTS</div>
+    <table style="width: 100%; margin-bottom: 10px;">
+      <tr><td style="font-weight: bold; width: 40%;">Samples Inspected:</td><td id="pdfSamplesEng"></td></tr>
+      <tr><td style="font-weight: bold;">Defects Found:</td><td id="pdfDefectsEng"></td></tr>
+      <tr><td style="font-weight: bold;">Defect Rate:</td><td id="pdfRateEng"></td></tr>
+      <tr><td style="font-weight: bold;">Acceptance Number (Ac):</td><td id="pdfAcValEng"></td></tr>
+      <tr><td style="font-weight: bold;">Rejection Number (Re):</td><td id="pdfReValEng"></td></tr>
+    </table>
+
+    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">4. DECISION</div>
+    <div id="pdfDecisionEng" style="text-align: center; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 5px; margin-top: 10px;"></div>
+  </div>
+
+  <!-- THAI SECTION -->
+  <div style="page-break-before: avoid;">
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #003366; padding-bottom: 10px;">
+      <div style="font-size: 18px; font-weight: bold; color: #003366;" id="pdfCompanyThai"></div>
+      <div style="font-size: 14px; font-weight: bold; color: #004499; margin-top: 5px;">รายงานผลการตรวจสอบ AQL</div>
+      <div style="font-size: 12px; color: #666; margin-top: 3px;">มาตรฐาน ANSI/ASQ Z1.4 - ISO 2859-1:2023</div>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px;">1. ข้อมูลการตรวจสอบ</div>
+      <table style="width: 100%; margin-bottom: 10px;">
+        <tr><td style="font-weight: bold; width: 40%;">บริษัท:</td><td id="pdfCompanyTh"></td></tr>
+        <tr><td style="font-weight: bold;">วันที่:</td><td id="pdfDateTh"></td></tr>
+        <tr><td style="font-weight: bold;">ผู้ตรวจสอบ:</td><td id="pdfInspectorTh"></td></tr>
+        <tr><td style="font-weight: bold;">แผนก:</td><td id="pdfDepartmentTh"></td></tr>
+        <tr><td style="font-weight: bold;">ชื่อสินค้า:</td><td id="pdfProductTh"></td></tr>
+      </table>
+
+      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">2. แผนการสุ่มตัวอย่าง</div>
+      <table style="width: 100%; margin-bottom: 10px;">
+        <tr><td style="font-weight: bold; width: 40%;">ระดับ AQL:</td><td id="pdfAqlTh"></td></tr>
+        <tr><td style="font-weight: bold;">ระดับการตรวจ:</td><td id="pdfLevelTh"></td></tr>
+        <tr><td style="font-weight: bold;">จำนวนลอต:</td><td id="pdfLotTh"></td></tr>
+        <tr><td style="font-weight: bold;">ขนาดตัวอย่าง:</td><td id="pdfSampleTh"></td></tr>
+        <tr><td style="font-weight: bold;">ยอมรับ (Ac):</td><td id="pdfAcTh"></td></tr>
+        <tr><td style="font-weight: bold;">ปฏิเสธ (Re):</td><td id="pdfReTh"></td></tr>
+      </table>
+
+      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">3. ผลการตรวจสอบ</div>
+      <table style="width: 100%; margin-bottom: 10px;">
+        <tr><td style="font-weight: bold; width: 40%;">ตัวอย่างที่ตรวจ:</td><td id="pdfSamplesTh"></td></tr>
+        <tr><td style="font-weight: bold;">ตำหนิที่พบ:</td><td id="pdfDefectsTh"></td></tr>
+        <tr><td style="font-weight: bold;">อัตราตำหนิ:</td><td id="pdfRateTh"></td></tr>
+        <tr><td style="font-weight: bold;">ยอมรับได้ (Ac):</td><td id="pdfAcValTh"></td></tr>
+        <tr><td style="font-weight: bold;">ปฏิเสธ (Re):</td><td id="pdfReValTh"></td></tr>
+      </table>
+
+      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">4. การตัดสินใจ</div>
+      <div id="pdfDecisionTh" style="text-align: center; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 5px; margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 11px; color: #999; text-align: center;">
+    <span id="pdfFooter"></span>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ============ Z1.4 CODE LETTER TABLE ============
 const codeLetter = {
-  //          S1  S2  S3  S4   I   II  III
-  "2-8":    ["A","A","A","A","A","A","B"],
-  "9-15":   ["A","A","A","A","A","B","C"],
-  "16-25":  ["A","A","B","B","B","C","D"],
-  "26-50":  ["A","B","B","C","C","D","E"],
-  "51-90":  ["B","B","C","C","C","E","F"],
+  "2-8": ["A","A","A","A","A","A","B"],
+  "9-15": ["A","A","A","A","A","B","C"],
+  "16-25": ["A","A","B","B","B","C","D"],
+  "26-50": ["A","B","B","C","C","D","E"],
+  "51-90": ["B","B","C","C","C","E","F"],
   "91-150": ["B","B","C","D","D","F","G"],
-  "151-280":["B","C","D","E","E","G","H"],
-  "281-500":["B","C","D","E","F","H","J"],
-  "501-1200":["C","C","E","F","G","J","K"],
-  "1201-3200":["C","D","E","G","H","K","L"],
-  "3201-10000":["C","D","F","G","J","L","M"],
-  "10001-35000":["C","D","F","H","K","M","N"],
-  "35001-150000":["D","E","G","J","L","N","P"],
-  "150001-500000":["D","E","G","J","M","P","Q"],
-  "500001+":["D","E","H","K","N","Q","R"]
+  "151-280": ["B","C","D","E","E","G","H"],
+  "281-500": ["B","C","D","E","F","H","J"],
+  "501-1200": ["C","C","E","F","G","J","K"],
+  "1201-3200": ["C","D","E","G","H","K","L"],
+  "3201-10000": ["C","D","F","G","J","L","M"],
+  "10001-35000": ["C","D","F","H","K","M","N"],
+  "35001-150000": ["D","E","G","J","L","N","P"],
+  "150001-500000": ["D","E","G","J","M","P","Q"],
+  "500001+": ["D","E","H","K","N","Q","R"]
 };
 
-// ============ SAMPLE SIZE PER CODE LETTER ============
 const sampleSizes = {
   A:2, B:3, C:5, D:8, E:13, F:20, G:32, H:50, J:80, K:125, L:200, M:315, N:500, P:800, Q:1250, R:2000
 };
 const codeOrder = ["A","B","C","D","E","F","G","H","J","K","L","M","N","P","Q","R"];
 
-// ============ Ac/Re TABLE (Normal Inspection) ============
-// key = code letter, value = { aql: [Ac, Re] }
-// ↓ means use next code letter down (larger sample)
-// Generated from ANSI/ASQ Z1.4 Table II-A
 const acReTable = {
   A: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[null],"2.5":[0,1],"4.0":[0,1],"6.5":[0,1]},
   B: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[0,1],"2.5":[0,1],"4.0":[0,1],"6.5":[1,2]},
@@ -794,7 +1007,15 @@ const inspLevelIndex = { S1:0, S2:1, S3:2, S4:3, I:4, II:5, III:6 };
 const aqlLevels = ["0.065","0.10","0.15","0.25","0.40","0.65","1.0","1.5","2.5","4.0","6.5"];
 const lotRanges = ["2-8","9-15","16-25","26-50","51-90","91-150","151-280","281-500","501-1200","1201-3200","3201-10000","10001-35000","35001-150000","150001-500000","500001+"];
 
-// ============ RESOLVE ARROW ============
+let samplingHistory = JSON.parse(localStorage.getItem('samplingHistory')) || [];
+let lastResult = null;
+
+function setPreset(aql, level) {
+  document.getElementById("aqlLevel").value = aql.toString();
+  document.getElementById("inspLevel").value = level;
+  toast(`Preset set: AQL ${aql} (${level})`,"success");
+}
+
 function resolveAcRe(startCode, aql) {
   let idx = codeOrder.indexOf(startCode);
   while (idx < codeOrder.length) {
@@ -808,7 +1029,6 @@ function resolveAcRe(startCode, aql) {
   return null;
 }
 
-// ============ GET LOT RANGE ============
 function getLotRange(n) {
   if (n>=2 && n<=8) return "2-8";
   if (n>=9 && n<=15) return "9-15";
@@ -828,7 +1048,6 @@ function getLotRange(n) {
   return null;
 }
 
-// ============ CALCULATE ============
 function calculate() {
   const aql = document.getElementById("aqlLevel").value;
   const level = document.getElementById("inspLevel").value;
@@ -853,7 +1072,6 @@ function calculate() {
 
   const { ss, ac, re } = result;
 
-  // Check 100% inspection
   const fi = document.getElementById("fullInspect");
   if (ss >= lot) {
     fi.classList.add("show");
@@ -861,14 +1079,11 @@ function calculate() {
     fi.classList.remove("show");
   }
 
-  // Display
   document.getElementById("resSS").textContent = ss >= lot ? lot + " (100%)" : ss;
   document.getElementById("resAc").textContent = ac;
   document.getElementById("resRe").textContent = re;
-
   document.querySelectorAll(".stat-card").forEach(c => c.classList.add("active"));
 
-  // Decision
   const dec = document.getElementById("decision");
   if (defects <= ac) {
     dec.className = "decision accept";
@@ -881,47 +1096,248 @@ function calculate() {
     dec.innerHTML = `⚠️ BETWEEN<div class="decision-sub">${ac} < Defects ${defects} < ${re}</div>`;
   }
 
-  // Highlight table row
-  highlightRow(lotRange);
+  document.getElementById("saveBtn").style.display = "block";
+  document.getElementById("exportBtn").style.display = "block";
 
-  // Update custom tab
-  updateCustomTable(aql, level);
+  lastResult = {
+    aql, level, lot, defects, ss, ac, re,
+    product: document.getElementById("productName").value || "N/A",
+    company: document.getElementById("companyName").value,
+    inspector: document.getElementById("inspectorName").value,
+    department: document.getElementById("department").value
+  };
 
   toast(`Calculated: Lot ${lot} → Sample ${ss}, Ac ${ac}, Re ${re}`,"success");
 }
 
-function highlightRow(range) {
-  document.querySelectorAll("tr.highlight").forEach(r => r.classList.remove("highlight"));
-  const rows = document.querySelectorAll("#fullBody tr, #customBody tr");
-  rows.forEach(r => {
-    if (r.cells[0] && r.cells[0].textContent === range) r.classList.add("highlight");
+function saveToHistory() {
+  if (!lastResult) {
+    toast("No result to save","error");
+    return;
+  }
+
+  const record = {
+    id: Date.now(),
+    timestamp: new Date().toLocaleString('th-TH'),
+    product: lastResult.product,
+    lot: lastResult.lot,
+    defects: lastResult.defects,
+    ss: lastResult.ss,
+    decision: lastResult.defects <= lastResult.ac ? "ACCEPT" : lastResult.defects >= lastResult.re ? "REJECT" : "BETWEEN",
+    aql: lastResult.aql,
+    ac: lastResult.ac,
+    re: lastResult.re,
+    ...lastResult
+  };
+
+  samplingHistory.unshift(record);
+  localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
+  loadHistory();
+  toast("✅ Result saved to history","success");
+}
+
+function loadHistory() {
+  const tbody = document.getElementById("historyRows");
+  tbody.innerHTML = "";
+
+  if (samplingHistory.length === 0) {
+    document.getElementById("historyCount").textContent = "No records yet";
+    return;
+  }
+
+  document.getElementById("historyCount").textContent = `${samplingHistory.length} record(s)`;
+
+  samplingHistory.forEach(record => {
+    const row = document.createElement("tr");
+    const decisionColor = record.decision === "ACCEPT" ? "green" : record.decision === "REJECT" ? "red" : "orange";
+    row.innerHTML = `
+      <td>${record.timestamp}</td>
+      <td>${record.product}</td>
+      <td>${record.lot}</td>
+      <td>${record.defects}</td>
+      <td>${record.ss}</td>
+      <td><span style="color:${decisionColor}; font-weight:bold;">${record.decision}</span></td>
+      <td>
+        <button class="action-btn" onclick="exportRecordPDF(${record.id})">PDF</button>
+        <button class="action-btn action-btn-delete" onclick="deleteRecord(${record.id})">Del</button>
+      </td>
+    `;
+    tbody.appendChild(row);
   });
 }
 
-// ============ PRESETS ============
-function applyPreset(type) {
-  const map = {
-    food: { aql:"0.065", level:"II" },
-    auto: { aql:"0.25", level:"II" },
-    consumer: { aql:"1.0", level:"II" },
-    cosmetic: { aql:"4.0", level:"I" }
-  };
-  const p = map[type];
-  document.getElementById("aqlLevel").value = p.aql;
-  document.getElementById("inspLevel").value = p.level;
-  toast(`Preset applied: ${type.toUpperCase()}`,"success");
+function deleteRecord(id) {
+  if (confirm("Delete this record?")) {
+    samplingHistory = samplingHistory.filter(r => r.id !== id);
+    localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
+    loadHistory();
+    toast("Record deleted","success");
+  }
 }
 
-// ============ TABS ============
+function clearAll() {
+  document.getElementById("aqlLevel").value = "";
+  document.getElementById("inspLevel").value = "II";
+  document.getElementById("lotSize").value = "";
+  document.getElementById("defects").value = "0";
+  document.getElementById("productName").value = "";
+  document.getElementById("resSS").textContent = "—";
+  document.getElementById("resAc").textContent = "—";
+  document.getElementById("resRe").textContent = "—";
+  document.getElementById("decision").className = "decision pending";
+  document.getElementById("decision").innerHTML = "⏳ Waiting for input";
+  document.getElementById("fullInspect").classList.remove("show");
+  document.querySelectorAll(".stat-card").forEach(c => c.classList.remove("active"));
+  document.getElementById("saveBtn").style.display = "none";
+  document.getElementById("exportBtn").style.display = "none";
+  lastResult = null;
+}
+
+function fillPdfContent(result) {
+  const today = new Date();
+  const dateEng = today.toLocaleDateString('en-US');
+  const dateTh = today.toLocaleDateString('th-TH');
+
+  // ENGLISH
+  document.getElementById("pdfCompanyEng").textContent = result.company;
+  document.getElementById("pdfDateEng").textContent = dateEng;
+  document.getElementById("pdfInspectorEng").textContent = result.inspector;
+  document.getElementById("pdfDepartmentEng").textContent = result.department;
+  document.getElementById("pdfProductEng").textContent = result.product;
+  document.getElementById("pdfAqlEng").textContent = result.aql;
+  document.getElementById("pdfLevelEng").textContent = result.level === "II" ? "Level II (Normal)" : result.level;
+  document.getElementById("pdfLotEng").textContent = result.lot;
+  document.getElementById("pdfSampleEng").textContent = result.ss;
+  document.getElementById("pdfAcEng").textContent = result.ac;
+  document.getElementById("pdfReEng").textContent = result.re;
+  document.getElementById("pdfSamplesEng").textContent = result.ss + " pieces";
+  document.getElementById("pdfDefectsEng").textContent = result.defects + " pieces";
+  document.getElementById("pdfRateEng").textContent = ((result.defects / result.ss * 100).toFixed(1)) + "%";
+  document.getElementById("pdfAcValEng").textContent = result.ac;
+  document.getElementById("pdfReValEng").textContent = result.re;
+
+  // THAI
+  document.getElementById("pdfCompanyTh").textContent = result.company;
+  document.getElementById("pdfDateTh").textContent = dateTh;
+  document.getElementById("pdfInspectorTh").textContent = result.inspector;
+  document.getElementById("pdfDepartmentTh").textContent = result.department;
+  document.getElementById("pdfProductTh").textContent = result.product;
+  document.getElementById("pdfAqlTh").textContent = result.aql;
+  document.getElementById("pdfLevelTh").textContent = "ระดับ II (ปกติ)";
+  document.getElementById("pdfLotTh").textContent = result.lot;
+  document.getElementById("pdfSampleTh").textContent = result.ss;
+  document.getElementById("pdfAcTh").textContent = result.ac;
+  document.getElementById("pdfReTh").textContent = result.re;
+  document.getElementById("pdfSamplesTh").textContent = result.ss + " ชิ้น";
+  document.getElementById("pdfDefectsTh").textContent = result.defects + " ชิ้น";
+  document.getElementById("pdfRateTh").textContent = ((result.defects / result.ss * 100).toFixed(1)) + "%";
+  document.getElementById("pdfAcValTh").textContent = result.ac;
+  document.getElementById("pdfReValTh").textContent = result.re;
+
+  // DECISION
+  let decisionEng, decisionTh, bgColor;
+  if (result.defects <= result.ac) {
+    decisionEng = "✅ ACCEPT";
+    decisionTh = "✅ ยอมรับ";
+    bgColor = "#22c55e";
+  } else if (result.defects >= result.re) {
+    decisionEng = "❌ REJECT";
+    decisionTh = "❌ ปฏิเสธ";
+    bgColor = "#ef4444";
+  } else {
+    decisionEng = "⚠️ BETWEEN";
+    decisionTh = "⚠️ สงสัย";
+    bgColor = "#f59e0b";
+  }
+
+  const decEng = document.getElementById("pdfDecisionEng");
+  const decTh = document.getElementById("pdfDecisionTh");
+  decEng.textContent = decisionEng + "\n(Defects: " + result.defects + " | Ac: " + result.ac + " | Re: " + result.re + ")";
+  decEng.style.backgroundColor = bgColor;
+  decEng.style.color = "#fff";
+  
+  decTh.textContent = decisionTh + "\n(ตำหนิ: " + result.defects + " | Ac: " + result.ac + " | Re: " + result.re + ")";
+  decTh.style.backgroundColor = bgColor;
+  decTh.style.color = "#fff";
+
+  // Company Name at header
+  document.getElementById("pdfCompanyName").textContent = result.company;
+  document.getElementById("pdfCompanyThai").textContent = result.company;
+
+  // Footer
+  document.getElementById("pdfFooter").textContent = "Generated: " + new Date().toLocaleString('en-US') + " | ANSI/ASQ Z1.4 - ISO 2859-1:2023";
+}
+
+async function exportPDF() {
+  if (!lastResult) {
+    toast("No result to export","error");
+    return;
+  }
+
+  try {
+    toast("Generating PDF...","success");
+    
+    fillPdfContent(lastResult);
+    
+    const element = document.getElementById('pdfContent');
+    const opt = {
+      margin: 5,
+      filename: `AQL_Report_${lastResult.lot}_${new Date().toISOString().slice(0,10)}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    await html2pdf().set(opt).from(element).save();
+    toast(`✅ PDF exported successfully!`,"success");
+
+  } catch (err) {
+    console.error("PDF export error:", err);
+    toast("Error generating PDF","error");
+  }
+}
+
+function exportRecordPDF(id) {
+  const record = samplingHistory.find(r => r.id === id);
+  if (!record) return;
+
+  try {
+    toast("Generating PDF...","success");
+    fillPdfContent(record);
+
+    const element = document.getElementById('pdfContent');
+    const opt = {
+      margin: 5,
+      filename: `AQL_Report_${record.lot}_${record.timestamp.replace(/\//g, '-').slice(0, 10)}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+    toast(`✅ PDF saved!`,"success");
+
+  } catch (err) {
+    console.error("Export error:", err);
+    toast("Error: " + err.message,"error");
+  }
+}
+
 function switchTab(tab) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   event.target.classList.add("active");
-  document.getElementById("tabFull").style.display = tab === "full" ? "block" : "none";
-  document.getElementById("tabCustom").style.display = tab === "custom" ? "block" : "none";
+  document.getElementById("tabReference").style.display = tab === "reference" ? "block" : "none";
+  document.getElementById("tabHistory").style.display = tab === "history" ? "block" : "none";
   document.getElementById("tabGuide").style.display = tab === "guide" ? "block" : "none";
 }
 
-// ============ RENDER TABLES ============
+function toast(msg, type) {
+  const t = document.getElementById("toast");
+  t.textContent = (type === "success" ? "✅ " : "❌ ") + msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
 function renderFullTable() {
   const tbody = document.getElementById("fullBody");
   tbody.innerHTML = "";
@@ -931,7 +1347,7 @@ function renderFullTable() {
     let html = `<td>${range}</td>`;
 
     aqlLevels.forEach(aql => {
-      const code = codeLetter[range][5]; // Level II
+      const code = codeLetter[range][5];
       const result = resolveAcRe(code, aql);
       if (result) {
         html += `<td>${result.ss}/${result.ac}/${result.re}</td>`;
@@ -945,28 +1361,6 @@ function renderFullTable() {
   });
 }
 
-function updateCustomTable(aql, level) {
-  const tbody = document.getElementById("customBody");
-  tbody.innerHTML = "";
-  document.getElementById("customTitle").textContent = `AQL ${aql} — ${level}`;
-
-  const levelIdx = inspLevelIndex[level];
-
-  lotRanges.forEach(range => {
-    const code = codeLetter[range][levelIdx];
-    const result = resolveAcRe(code, aql);
-    const tr = document.createElement("tr");
-
-    if (result) {
-      tr.innerHTML = `<td>${range}</td><td>${result.ss}</td><td>${result.ac}</td><td>${result.re}</td>`;
-    } else {
-      tr.innerHTML = `<td>${range}</td><td colspan="3" style="color:var(--text2)">—</td>`;
-    }
-
-    tbody.appendChild(tr);
-  });
-}
-
 function renderGuideTable() {
   const tbody = document.getElementById("guideBody");
   const data = [
@@ -974,58 +1368,27 @@ function renderGuideTable() {
     ["💊 Pharmaceutical","0.065 (C=0)","0.25","1.0","Level II"],
     ["🏥 Medical Device","0.065 (C=0)","0.25","1.0","Level II"],
     ["🚗 Automotive (OEM)","0.065 (C=0)","0.25","1.0","Level II"],
-    ["✈️ Aerospace & Defense","0.065 (C=0)","0.10","0.65","Level III"],
+    ["✈️ Aerospace","0.065 (C=0)","0.10","0.65","Level III"],
     ["📱 Electronics","0.065 (C=0)","0.40","2.5","Level II"],
     ["🧴 Cosmetics","0.065 (C=0)","0.65","2.5","Level II"],
-    ["👕 Textile / Garment","0.065 (C=0)","1.0","2.5","Level II"],
+    ["👕 Textile","0.065 (C=0)","1.0","2.5","Level II"],
     ["🧱 Plastic Injection","0.065 (C=0)","0.40","2.5","Level II"],
-    ["🔩 Metal / Hardware","0.065 (C=0)","0.65","2.5","Level II"],
-    ["📦 General Consumer","0.065 (C=0)","1.0","4.0","Level II"],
-    ["🪵 Furniture / Wood","0.065 (C=0)","1.5","4.0","Level I"],
-    ["🎁 Toys / Gifts","0.065 (C=0)","1.0","4.0","Level II"],
-    ["🏗️ Construction Material","0.065 (C=0)","1.0","2.5","Level II"],
-    ["🧪 Chemical / Paint","0.065 (C=0)","0.65","2.5","Level II"],
   ];
 
   data.forEach(row => {
     const tr = document.createElement("tr");
-    tr.innerHTML = row.map((c,i) => i===0 ? `<td style="text-align:left;padding-left:20px;font-weight:600;">${c}</td>` : `<td>${c}</td>`).join("");
+    tr.innerHTML = row.map((c,i) => i===0 ? `<td style="text-align:left;">${c}</td>` : `<td>${c}</td>`).join("");
     tbody.appendChild(tr);
   });
 }
 
-// ============ CLEAR ============
-function clearAll() {
-  document.getElementById("aqlLevel").value = "";
-  document.getElementById("inspLevel").value = "II";
-  document.getElementById("lotSize").value = "";
-  document.getElementById("defects").value = "0";
-  document.getElementById("resSS").textContent = "—";
-  document.getElementById("resAc").textContent = "—";
-  document.getElementById("resRe").textContent = "—";
-  document.getElementById("decision").className = "decision pending";
-  document.getElementById("decision").innerHTML = "⏳ Waiting for input";
-  document.getElementById("fullInspect").classList.remove("show");
-  document.querySelectorAll(".stat-card").forEach(c => c.classList.remove("active"));
-  document.querySelectorAll("tr.highlight").forEach(r => r.classList.remove("highlight"));
-}
-
-// ============ TOAST ============
-function toast(msg, type) {
-  const t = document.getElementById("toast");
-  t.textContent = (type === "success" ? "✅ " : "❌ ") + msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-// ============ ENTER KEY ============
 document.getElementById("lotSize").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
 document.getElementById("defects").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
 
-// ============ INIT ============
 window.addEventListener("load", () => {
   renderFullTable();
   renderGuideTable();
+  loadHistory();
 });
 </script>
 </body>
