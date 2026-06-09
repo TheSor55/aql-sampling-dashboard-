@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AQL Sampling Dashboard - Universal</title>
+<title>AQL Sampling Dashboard - Universal QC Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
@@ -14,8 +14,8 @@
   --border: #2d3148;
   --text: #e8eaf0;
   --text2: #8b90a5;
-  --accent: #6c7cff;
-  --accent2: #4dd4ac;
+  --accent: #3b82f6;
+  --accent2: #10b981;
   --accept: #22c55e;
   --reject: #ef4444;
   --warn: #f59e0b;
@@ -32,8 +32,8 @@ body {
 }
 
 .topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #1a1d27 0%, #222633 100%);
+  border-bottom: 2px solid var(--accent);
   padding: 16px 32px;
   display: flex;
   align-items: center;
@@ -47,43 +47,51 @@ body {
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-main {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
-.logo-text span {
-  color: var(--text2);
-  font-weight: 400;
-  font-size: 13px;
-  margin-left: 8px;
+.logo-sub {
+  font-size: 11px;
+  color: var(--accent2);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .standard-badge {
   background: var(--surface2);
   border: 1px solid var(--border);
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text2);
   font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
 }
 
 .app {
@@ -163,7 +171,7 @@ body {
 .field select:focus,
 .field input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(108,124,255,0.15);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .field select option {
@@ -200,7 +208,8 @@ body {
 
 .preset-btn:hover {
   border-color: var(--accent);
-  background: rgba(108,124,255,0.1);
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
 }
 
 .preset-label {
@@ -232,13 +241,13 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  background: linear-gradient(135deg, var(--accent), #2563eb);
   color: #fff;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(108,124,255,0.35);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
 }
 
 .btn-ghost {
@@ -253,13 +262,13 @@ body {
 }
 
 .btn-success {
-  background: linear-gradient(135deg, var(--accent2), #10b981);
+  background: linear-gradient(135deg, var(--accent2), #059669);
   color: #fff;
 }
 
 .btn-success:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(77,212,172,0.35);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
 
 .btn-sm {
@@ -449,7 +458,7 @@ td:first-child {
 }
 
 tr:hover td {
-  background: rgba(108,124,255,0.04);
+  background: rgba(59, 130, 246, 0.04);
 }
 
 .history-table {
@@ -478,7 +487,7 @@ tr:hover td {
 }
 
 .history-table tr:hover {
-  background: rgba(108,124,255,0.04);
+  background: rgba(59, 130, 246, 0.04);
 }
 
 .action-btn {
@@ -493,7 +502,7 @@ tr:hover td {
 }
 
 .action-btn:hover {
-  background: #8b5cf6;
+  background: #2563eb;
 }
 
 .action-btn-delete {
@@ -553,7 +562,6 @@ tr:hover td {
   display: block;
 }
 
-/* PDF STYLES */
 .pdf-container {
   display: none;
   width: 210mm;
@@ -568,66 +576,6 @@ tr:hover td {
 
 .pdf-container.show {
   display: block;
-}
-
-.pdf-section {
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #003366;
-}
-
-.pdf-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #003366;
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.pdf-subtitle {
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.pdf-row {
-  display: flex;
-  margin-bottom: 8px;
-}
-
-.pdf-label {
-  width: 45%;
-  font-weight: bold;
-  padding-right: 10px;
-}
-
-.pdf-value {
-  width: 55%;
-}
-
-.pdf-decision {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  margin: 15px 0;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.pdf-decision.accept {
-  background-color: #22c55e;
-  color: white;
-}
-
-.pdf-decision.reject {
-  background-color: #ef4444;
-  color: white;
-}
-
-.pdf-decision.pending {
-  background-color: #f59e0b;
-  color: white;
 }
 
 @media (max-width: 900px) {
@@ -648,8 +596,11 @@ tr:hover td {
 
 <div class="topbar">
   <div class="logo">
-    <div class="logo-icon">AQ</div>
-    <div class="logo-text">AQL Dashboard <span>Universal Sampling</span></div>
+    <div class="logo-icon">🔍</div>
+    <div class="logo-text">
+      <div class="logo-main">AQL Sampling</div>
+      <div class="logo-sub">Quality Control Tool</div>
+    </div>
   </div>
   <div class="standard-badge">ANSI/ASQ Z1.4 · ISO 2859-1</div>
 </div>
@@ -658,21 +609,21 @@ tr:hover td {
   <div class="sidebar">
 
     <div class="panel">
-      <div class="panel-title">Company Info</div>
+      <div class="panel-title">Company Information</div>
 
       <div class="field">
         <label>Company Name</label>
-        <input type="text" id="companyName" placeholder="บริษัท สาลี่อุตสาหกรรม" value="บริษัท สาลี่อุตสาหกรรม">
+        <input type="text" id="companyName" placeholder="Your Company Name">
       </div>
 
       <div class="field">
         <label>Inspector Name</label>
-        <input type="text" id="inspectorName" placeholder="เช่น นาย สรวิศ" value="นาย สรวิศ">
+        <input type="text" id="inspectorName" placeholder="Inspector Name">
       </div>
 
       <div class="field">
         <label>Department</label>
-        <input type="text" id="department" placeholder="Quality Control Department" value="Quality Control Department">
+        <input type="text" id="department" placeholder="Quality Control Department">
       </div>
     </div>
 
@@ -723,7 +674,7 @@ tr:hover td {
       <div class="field-row">
         <div class="field">
           <label>Lot Size</label>
-          <input type="number" id="lotSize" placeholder="เช่น 1000" min="2" max="999999">
+          <input type="number" id="lotSize" placeholder="e.g., 1000" min="2" max="999999">
         </div>
         <div class="field">
           <label>Defects Found</label>
@@ -733,11 +684,11 @@ tr:hover td {
 
       <div class="field">
         <label>Product Name</label>
-        <input type="text" id="productName" placeholder="PP Injection Parts">
+        <input type="text" id="productName" placeholder="Product Name">
       </div>
 
       <div class="full-inspect" id="fullInspect">
-        ⚠️ Sample Size ≥ Lot Size → ต้องตรวจ 100%
+        ⚠️ Sample ≥ Lot → 100% Inspection Required
       </div>
 
       <div class="btn-row">
@@ -1013,7 +964,7 @@ let lastResult = null;
 function setPreset(aql, level) {
   document.getElementById("aqlLevel").value = aql.toString();
   document.getElementById("inspLevel").value = level;
-  toast(`Preset set: AQL ${aql} (${level})`,"success");
+  toast(`Preset: AQL ${aql} (${level})`,"success");
 }
 
 function resolveAcRe(startCode, aql) {
@@ -1054,11 +1005,11 @@ function calculate() {
   const lotStr = document.getElementById("lotSize").value.trim();
   const defStr = document.getElementById("defects").value.trim();
 
-  if (!aql) return toast("Select an AQL level","error");
+  if (!aql) return toast("Select AQL level","error");
   if (!lotStr) return toast("Enter Lot Size","error");
 
   const lot = parseInt(lotStr);
-  if (isNaN(lot) || lot < 2) return toast("Lot Size must be ≥ 2","error");
+  if (isNaN(lot) || lot < 2) return toast("Lot Size ≥ 2 required","error");
 
   const defects = parseInt(defStr) || 0;
   const lotRange = getLotRange(lot);
@@ -1068,7 +1019,7 @@ function calculate() {
   const startCode = codeLetter[lotRange][levelIdx];
   const result = resolveAcRe(startCode, aql);
 
-  if (!result) return toast("No sampling plan for this combination","error");
+  if (!result) return toast("No plan for this combination","error");
 
   const { ss, ac, re } = result;
 
@@ -1101,13 +1052,13 @@ function calculate() {
 
   lastResult = {
     aql, level, lot, defects, ss, ac, re,
-    product: document.getElementById("productName").value || "N/A",
-    company: document.getElementById("companyName").value,
-    inspector: document.getElementById("inspectorName").value,
-    department: document.getElementById("department").value
+    product: document.getElementById("productName").value || "Unnamed",
+    company: document.getElementById("companyName").value || "N/A",
+    inspector: document.getElementById("inspectorName").value || "N/A",
+    department: document.getElementById("department").value || "QC"
   };
 
-  toast(`Calculated: Lot ${lot} → Sample ${ss}, Ac ${ac}, Re ${re}`,"success");
+  toast(`Lot ${lot} → Sample ${ss}, Ac ${ac}, Re ${re}`,"success");
 }
 
 function saveToHistory() {
@@ -1133,7 +1084,7 @@ function saveToHistory() {
   samplingHistory.unshift(record);
   localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
   loadHistory();
-  toast("✅ Result saved to history","success");
+  toast("Result saved","success");
 }
 
 function loadHistory() {
@@ -1141,7 +1092,7 @@ function loadHistory() {
   tbody.innerHTML = "";
 
   if (samplingHistory.length === 0) {
-    document.getElementById("historyCount").textContent = "No records yet";
+    document.getElementById("historyCount").textContent = "No records";
     return;
   }
 
@@ -1149,7 +1100,7 @@ function loadHistory() {
 
   samplingHistory.forEach(record => {
     const row = document.createElement("tr");
-    const decisionColor = record.decision === "ACCEPT" ? "green" : record.decision === "REJECT" ? "red" : "orange";
+    const decisionColor = record.decision === "ACCEPT" ? "#22c55e" : record.decision === "REJECT" ? "#ef4444" : "#f59e0b";
     row.innerHTML = `
       <td>${record.timestamp}</td>
       <td>${record.product}</td>
@@ -1167,11 +1118,11 @@ function loadHistory() {
 }
 
 function deleteRecord(id) {
-  if (confirm("Delete this record?")) {
+  if (confirm("Delete record?")) {
     samplingHistory = samplingHistory.filter(r => r.id !== id);
     localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
     loadHistory();
-    toast("Record deleted","success");
+    toast("Deleted","success");
   }
 }
 
@@ -1198,14 +1149,13 @@ function fillPdfContent(result) {
   const dateEng = today.toLocaleDateString('en-US');
   const dateTh = today.toLocaleDateString('th-TH');
 
-  // ENGLISH
   document.getElementById("pdfCompanyEng").textContent = result.company;
   document.getElementById("pdfDateEng").textContent = dateEng;
   document.getElementById("pdfInspectorEng").textContent = result.inspector;
   document.getElementById("pdfDepartmentEng").textContent = result.department;
   document.getElementById("pdfProductEng").textContent = result.product;
   document.getElementById("pdfAqlEng").textContent = result.aql;
-  document.getElementById("pdfLevelEng").textContent = result.level === "II" ? "Level II (Normal)" : result.level;
+  document.getElementById("pdfLevelEng").textContent = "Level II (Normal)";
   document.getElementById("pdfLotEng").textContent = result.lot;
   document.getElementById("pdfSampleEng").textContent = result.ss;
   document.getElementById("pdfAcEng").textContent = result.ac;
@@ -1216,7 +1166,6 @@ function fillPdfContent(result) {
   document.getElementById("pdfAcValEng").textContent = result.ac;
   document.getElementById("pdfReValEng").textContent = result.re;
 
-  // THAI
   document.getElementById("pdfCompanyTh").textContent = result.company;
   document.getElementById("pdfDateTh").textContent = dateTh;
   document.getElementById("pdfInspectorTh").textContent = result.inspector;
@@ -1234,7 +1183,6 @@ function fillPdfContent(result) {
   document.getElementById("pdfAcValTh").textContent = result.ac;
   document.getElementById("pdfReValTh").textContent = result.re;
 
-  // DECISION
   let decisionEng, decisionTh, bgColor;
   if (result.defects <= result.ac) {
     decisionEng = "✅ ACCEPT";
@@ -1260,11 +1208,8 @@ function fillPdfContent(result) {
   decTh.style.backgroundColor = bgColor;
   decTh.style.color = "#fff";
 
-  // Company Name at header
-  document.getElementById("pdfCompanyName").textContent = result.company;
-  document.getElementById("pdfCompanyThai").textContent = result.company;
-
-  // Footer
+  document.getElementById("pdfCompanyName").textContent = result.company || "AQL Report";
+  document.getElementById("pdfCompanyThai").textContent = result.company || "รายงาน AQL";
   document.getElementById("pdfFooter").textContent = "Generated: " + new Date().toLocaleString('en-US') + " | ANSI/ASQ Z1.4 - ISO 2859-1:2023";
 }
 
@@ -1289,10 +1234,10 @@ async function exportPDF() {
     };
 
     await html2pdf().set(opt).from(element).save();
-    toast(`✅ PDF exported successfully!`,"success");
+    toast(`PDF exported!`,"success");
 
   } catch (err) {
-    console.error("PDF export error:", err);
+    console.error("PDF error:", err);
     toast("Error generating PDF","error");
   }
 }
@@ -1315,11 +1260,11 @@ function exportRecordPDF(id) {
     };
 
     html2pdf().set(opt).from(element).save();
-    toast(`✅ PDF saved!`,"success");
+    toast(`PDF saved!`,"success");
 
   } catch (err) {
     console.error("Export error:", err);
-    toast("Error: " + err.message,"error");
+    toast("Error","error");
   }
 }
 
@@ -1364,15 +1309,15 @@ function renderFullTable() {
 function renderGuideTable() {
   const tbody = document.getElementById("guideBody");
   const data = [
-    ["🍱 Food & Beverage","0.065 (C=0)","0.40","2.5","Level II"],
-    ["💊 Pharmaceutical","0.065 (C=0)","0.25","1.0","Level II"],
-    ["🏥 Medical Device","0.065 (C=0)","0.25","1.0","Level II"],
-    ["🚗 Automotive (OEM)","0.065 (C=0)","0.25","1.0","Level II"],
-    ["✈️ Aerospace","0.065 (C=0)","0.10","0.65","Level III"],
-    ["📱 Electronics","0.065 (C=0)","0.40","2.5","Level II"],
-    ["🧴 Cosmetics","0.065 (C=0)","0.65","2.5","Level II"],
-    ["👕 Textile","0.065 (C=0)","1.0","2.5","Level II"],
-    ["🧱 Plastic Injection","0.065 (C=0)","0.40","2.5","Level II"],
+    ["🍱 Food & Beverage","0.065","0.40","2.5","Level II"],
+    ["💊 Pharmaceutical","0.065","0.25","1.0","Level II"],
+    ["🏥 Medical Device","0.065","0.25","1.0","Level II"],
+    ["🚗 Automotive","0.065","0.25","1.0","Level II"],
+    ["✈️ Aerospace","0.065","0.10","0.65","Level III"],
+    ["📱 Electronics","0.065","0.40","2.5","Level II"],
+    ["🧴 Cosmetics","0.065","0.65","2.5","Level II"],
+    ["👕 Textile","0.065","1.0","2.5","Level II"],
+    ["🧪 Plastic Injection","0.065","0.40","2.5","Level II"],
   ];
 
   data.forEach(row => {
