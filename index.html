@@ -1,822 +1,298 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AQL Sampling Dashboard - Universal QC Tool</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-:root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface2: #222633;
-  --border: #2d3148;
-  --text: #e8eaf0;
-  --text2: #8b90a5;
-  --accent: #3b82f6;
-  --accent2: #10b981;
-  --accept: #22c55e;
-  --reject: #ef4444;
-  --warn: #f59e0b;
-  --r: 10px;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-.topbar {
-  background: linear-gradient(135deg, #1a1d27 0%, #222633 100%);
-  border-bottom: 2px solid var(--accent);
-  padding: 16px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(12px);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.logo-main {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.logo-sub {
-  font-size: 11px;
-  color: var(--accent2);
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.standard-badge {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 11px;
-  color: var(--text2);
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-}
-
-.app {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  min-height: calc(100vh - 69px);
-}
-
-.sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
-
-.panel {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 20px;
-}
-
-.panel-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text2);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.panel-title::before {
-  content: '';
-  width: 3px;
-  height: 14px;
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-.field {
-  margin-bottom: 16px;
-}
-
-.field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text2);
-  margin-bottom: 6px;
-}
-
-.field select,
-.field input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.field select:hover,
-.field input:hover {
-  border-color: var(--accent);
-}
-
-.field select:focus,
-.field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.field select option {
-  background: var(--surface);
-  color: var(--text);
-}
-
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.preset-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.preset-btn {
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-
-.preset-btn:hover {
-  border-color: var(--accent);
-  background: rgba(59, 130, 246, 0.1);
-  transform: translateY(-2px);
-}
-
-.preset-label {
-  font-size: 10px;
-  color: var(--text2);
-  margin-top: 2px;
-}
-
-.btn-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.btn {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), #2563eb);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
-}
-
-.btn-ghost {
-  background: var(--bg);
-  color: var(--text2);
-  border: 1px solid var(--border);
-}
-
-.btn-ghost:hover {
-  border-color: var(--text2);
-  color: var(--text);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, var(--accent2), #059669);
-  color: #fff;
-}
-
-.btn-success:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-}
-
-.btn-sm {
-  padding: 8px 14px;
-  font-size: 12px;
-}
-
-.result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.stat-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-  text-align: center;
-  transition: all 0.3s;
-}
-
-.stat-card.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-
-.stat-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text2);
-  margin-bottom: 6px;
-}
-
-.stat-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.decision {
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 15px;
-  transition: all 0.3s;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text2);
-}
-
-.decision.accept {
-  background: rgba(34,197,94,0.1);
-  border-color: var(--accept);
-  color: var(--accept);
-}
-
-.decision.reject {
-  background: rgba(239,68,68,0.1);
-  border-color: var(--reject);
-  color: var(--reject);
-}
-
-.decision.pending {
-  background: rgba(245,158,11,0.08);
-  border-color: var(--warn);
-  color: var(--warn);
-}
-
-.decision-sub {
-  font-size: 12px;
-  font-weight: 400;
-  margin-top: 4px;
-  opacity: 0.8;
-}
-
-.main {
-  padding: 24px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 4px;
-  width: fit-content;
-}
-
-.tab {
-  padding: 8px 18px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: var(--text2);
-  background: transparent;
-  border: none;
-  font-family: 'DM Sans', sans-serif;
-}
-
-.tab:hover {
-  color: var(--text);
-}
-
-.tab.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-.table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-}
-
-.table-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.table-title {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.table-subtitle {
-  font-size: 12px;
-  color: var(--text2);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-thead {
-  background: var(--surface2);
-}
-
-th {
-  padding: 10px 16px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text2);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-th:first-child {
-  text-align: left;
-  padding-left: 20px;
-}
-
-td {
-  padding: 10px 16px;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-}
-
-td:first-child {
-  text-align: left;
-  padding-left: 20px;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-tr:hover td {
-  background: rgba(59, 130, 246, 0.04);
-}
-
-.history-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 12px;
-}
-
-.history-table thead {
-  background: var(--surface2);
-}
-
-.history-table th {
-  padding: 10px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text2);
-  border-bottom: 1px solid var(--border);
-}
-
-.history-table td {
-  padding: 10px;
-  border-bottom: 1px solid var(--border);
-}
-
-.history-table tr:hover {
-  background: rgba(59, 130, 246, 0.04);
-}
-
-.action-btn {
-  padding: 4px 10px;
-  font-size: 11px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 4px;
-}
-
-.action-btn:hover {
-  background: #2563eb;
-}
-
-.action-btn-delete {
-  background: var(--reject);
-}
-
-.action-btn-delete:hover {
-  background: #dc2626;
-}
-
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 999;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.toast.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.toast.success {
-  background: rgba(34,197,94,0.15);
-  border: 1px solid var(--accept);
-  color: var(--accept);
-}
-
-.toast.error {
-  background: rgba(239,68,68,0.15);
-  border: 1px solid var(--reject);
-  color: var(--reject);
-}
-
-.full-inspect {
-  background: rgba(245,158,11,0.1);
-  border: 1px solid var(--warn);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 12px;
-  color: var(--warn);
-  display: none;
-  margin-top: 8px;
-}
-
-.full-inspect.show {
-  display: block;
-}
-
-#reportCapture {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-  .sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .topbar {
-    padding: 12px 16px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQL Sampling Dashboard - Complete QC Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #0f1117; color: #e8eaf0; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .panel { background: #1a1d27; border-radius: 10px; padding: 30px; border: 1px solid #2d3148; }
+    h1 { color: #3b82f6; margin-bottom: 20px; text-align: center; grid-column: 1/-1; }
+    h2 { color: #3b82f6; margin-bottom: 15px; font-size: 16px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; color: #8b90a5; font-size: 12px; }
+    input, select { width: 100%; padding: 10px; background: #0f1117; border: 1px solid #2d3148; border-radius: 5px; color: #e8eaf0; font-family: Arial; }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    button { padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; font-weight: bold; margin-right: 10px; margin-bottom: 10px; }
+    button:hover { background: #2563eb; }
+    button.clear { background: #666; }
+    button.clear:hover { background: #555; }
+    button.export { background: #10b981; }
+    button.export:hover { background: #059669; }
+    .result { background: #222633; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #2d3148; }
+    .stat-box { display: inline-block; margin-right: 30px; margin-bottom: 15px; }
+    .stat-label { font-size: 11px; color: #8b90a5; text-transform: uppercase; }
+    .stat-value { font-size: 28px; font-weight: bold; color: #3b82f6; }
+    .decision { padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 16px; margin-top: 15px; }
+    .decision.accept { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #22c55e; }
+    .decision.reject { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+    .decision.pending { background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #f59e0b; }
+    
+    .table-section { grid-column: 1/-1; background: #222633; border-radius: 10px; padding: 20px; border: 1px solid #2d3148; max-height: 500px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #1a1d27; padding: 10px; text-align: left; font-weight: bold; color: #8b90a5; border-bottom: 1px solid #2d3148; position: sticky; top: 0; }
+    td { padding: 8px 10px; border-bottom: 1px solid #2d3148; text-align: center; font-family: 'Courier New', monospace; font-size: 11px; }
+    td:first-child { text-align: left; font-weight: bold; color: #3b82f6; }
+    tr:hover { background: rgba(59,130,246,0.05); }
+    
+    .industry-badge { display: inline-block; background: #3b82f6; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-bottom: 10px; }
+    
+    @media (max-width: 1200px) {
+      .main-content { grid-template-columns: 1fr; }
+      .stat-box { margin-right: 15px; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-icon">🔍</div>
-    <div class="logo-text">
-      <div class="logo-main">AQL Sampling</div>
-      <div class="logo-sub">Quality Control Tool</div>
-    </div>
-  </div>
-  <div class="standard-badge">ANSI/ASQ Z1.4 · ISO 2859-1</div>
-</div>
-
-<div class="app">
-  <div class="sidebar">
-
+<div class="container">
+  <h1>🔍 AQL Sampling Dashboard - Complete QC Tool</h1>
+  
+  <div class="main-content">
+    <!-- Left Panel: Input Form -->
     <div class="panel">
-      <div class="panel-title">Company Information</div>
-
-      <div class="field">
+      <h2>📋 Inspection Setup</h2>
+      
+      <div class="form-group">
+        <label>Industry Type</label>
+        <select id="industry" onchange="setIndustryAQL()">
+          <option value="">-- Select Industry --</option>
+          <option value="pharma">🍱 Food & Pharmaceutical (Critical)</option>
+          <option value="auto">🚗 Automotive (Strict)</option>
+          <option value="medical">🏥 Medical Device (Strict)</option>
+          <option value="consumer">👕 Consumer Products (Standard)</option>
+          <option value="electronics">📱 Electronics (Standard)</option>
+          <option value="cosmetic">💄 Cosmetics (Relaxed)</option>
+          <option value="textile">🧵 Textile (Moderate)</option>
+          <option value="custom">⚙️ Custom AQL</option>
+        </select>
+      </div>
+      
+      <div id="industryInfo" style="display:none; margin-bottom: 15px;">
+        <div class="industry-badge" id="industryBadge"></div>
+      </div>
+      
+      <div class="form-group">
         <label>Company Name</label>
-        <input type="text" id="companyName" placeholder="Your Company Name">
+        <input type="text" id="company" placeholder="Your Company Name">
       </div>
 
-      <div class="field">
-        <label>Inspector Name</label>
-        <input type="text" id="inspectorName" placeholder="Inspector Name">
+      <div class="row">
+        <div class="form-group">
+          <label>Inspector Name</label>
+          <input type="text" id="inspector" placeholder="Inspector Name">
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="department" placeholder="Quality Control">
+        </div>
       </div>
 
-      <div class="field">
-        <label>Department</label>
-        <input type="text" id="department" placeholder="Quality Control Department">
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title">Quick Presets</div>
-      <div class="preset-grid">
-        <button class="preset-btn" onclick="setPreset(0.065, 'II')">🍱 Food / Pharma<div class="preset-label">AQL 0.065 (Critical)</div></button>
-        <button class="preset-btn" onclick="setPreset(0.25, 'II')">🚗 Automotive<div class="preset-label">AQL 0.25 (Strict)</div></button>
-        <button class="preset-btn" onclick="setPreset(0.40, 'II')">👕 Consumer<div class="preset-label">AQL 0.40 (General)</div></button>
-        <button class="preset-btn" onclick="setPreset(4.0, 'II')">💄 Cosmetic Only<div class="preset-label">AQL 4.0 (Visual)</div></button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title">Inspection Setup</div>
-
-      <div class="field">
-        <label>AQL Level</label>
-        <select id="aqlLevel">
-          <option value="">-- Select AQL --</option>
-          <option value="0.065">0.065 — Zero tolerance</option>
-          <option value="0.10">0.10 — Near zero</option>
-          <option value="0.15">0.15 — Ultra strict</option>
-          <option value="0.25">0.25 — Very strict</option>
-          <option value="0.40" selected>0.40 — Strict</option>
-          <option value="0.65">0.65 — Standard</option>
-          <option value="1.0">1.0 — Normal</option>
-          <option value="1.5">1.5 — Moderate</option>
-          <option value="2.5">2.5 — Relaxed</option>
-          <option value="4.0">4.0 — Loose</option>
-          <option value="6.5">6.5 — Very loose</option>
-        </select>
+      <div class="row">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="product" placeholder="Product Name">
+        </div>
+        <div class="form-group">
+          <label>AQL Level</label>
+          <select id="aql">
+            <option value="">-- Select AQL --</option>
+            <option value="0.065">0.065 (Critical)</option>
+            <option value="0.25">0.25 (Strict)</option>
+            <option value="0.40" selected>0.40 (Standard)</option>
+            <option value="1.0">1.0 (Normal)</option>
+            <option value="2.5">2.5 (Relaxed)</option>
+            <option value="4.0">4.0 (Loose)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="field">
-        <label>Inspection Level</label>
-        <select id="inspLevel">
-          <option value="S1">S-1 (Special - Smallest)</option>
-          <option value="S2">S-2 (Special)</option>
-          <option value="S3">S-3 (Special)</option>
-          <option value="S4">S-4 (Special)</option>
-          <option value="I">Level I (Reduced)</option>
-          <option value="II" selected>Level II (Normal) ★</option>
-          <option value="III">Level III (Tightened)</option>
-        </select>
-      </div>
-
-      <div class="field-row">
-        <div class="field">
+      <div class="row">
+        <div class="form-group">
           <label>Lot Size</label>
-          <input type="number" id="lotSize" placeholder="e.g., 1000" min="2" max="999999">
+          <input type="number" id="lotSize" placeholder="e.g., 1000" min="2">
         </div>
-        <div class="field">
+        <div class="form-group">
           <label>Defects Found</label>
-          <input type="number" id="defects" placeholder="0" min="0" max="999" value="0">
+          <input type="number" id="defects" placeholder="0" min="0" value="0">
         </div>
       </div>
 
-      <div class="field">
-        <label>Product Name</label>
-        <input type="text" id="productName" placeholder="Product Name">
+      <div>
+        <button onclick="calculate()">Calculate</button>
+        <button class="clear" onclick="clearForm()">Clear</button>
       </div>
 
-      <div class="full-inspect" id="fullInspect">
-        ⚠️ Sample ≥ Lot → 100% Inspection Required
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="calculate()">Calculate</button>
-        <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+      <div class="result" id="result" style="display:none;">
+        <h2>Result</h2>
+        <div class="stat-box">
+          <div class="stat-label">Sample Size</div>
+          <div class="stat-value" id="ss">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Accept (Ac)</div>
+          <div class="stat-value" id="ac">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Reject (Re)</div>
+          <div class="stat-value" id="re">—</div>
+        </div>
+        <div class="decision pending" id="decision">Waiting for input</div>
+        <button class="export" onclick="exportPDF()" style="margin-top: 15px; width: 100%;">📥 Export PDF Report</button>
       </div>
     </div>
 
+    <!-- Right Panel: Reference Tables -->
     <div class="panel">
-      <div class="panel-title">Result</div>
-
-      <div class="result-grid">
-        <div class="stat-card" id="cardSS">
-          <div class="stat-label">Sample</div>
-          <div class="stat-value" id="resSS">—</div>
-        </div>
-        <div class="stat-card" id="cardAc">
-          <div class="stat-label">Accept</div>
-          <div class="stat-value" id="resAc">—</div>
-        </div>
-        <div class="stat-card" id="cardRe">
-          <div class="stat-label">Reject</div>
-          <div class="stat-value" id="resRe">—</div>
-        </div>
-      </div>
-
-      <div class="decision pending" id="decision">
-        ⏳ Waiting for input
-      </div>
-
-      <div class="btn-row" style="margin-top: 12px;">
-        <button class="btn btn-success btn-sm" onclick="saveToHistory()" id="saveBtn" style="display:none;">
-          💾 Save Result
-        </button>
-        <button class="btn btn-success btn-sm" onclick="exportDashboardPDF()" id="exportBtn" style="display:none; grid-column:auto;">
-          📥 Export PDF
-        </button>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="main">
-
-    <div class="tabs" id="tabBar">
-      <button class="tab active" onclick="switchTab('reference')">Reference</button>
-      <button class="tab" onclick="switchTab('history')">📋 History</button>
-      <button class="tab" onclick="switchTab('guide')">Guide</button>
-    </div>
-
-    <div class="table-wrap" id="tabReference">
-      <div class="table-header">
-        <div>
-          <div class="table-title">ANSI/ASQ Z1.4 — Level II</div>
-          <div class="table-subtitle">All AQL levels reference table</div>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
+      <h2>📊 AQL Reference Table (Level II)</h2>
+      <div class="table-section">
         <table>
           <thead>
             <tr>
               <th>Lot Size</th>
               <th>0.065</th>
-              <th>0.10</th>
-              <th>0.15</th>
               <th>0.25</th>
               <th>0.40</th>
-              <th>0.65</th>
               <th>1.0</th>
-              <th>1.5</th>
               <th>2.5</th>
               <th>4.0</th>
-              <th>6.5</th>
             </tr>
           </thead>
-          <tbody id="fullBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="table-wrap" id="tabHistory" style="display:none;">
-      <div class="table-header">
-        <div>
-          <div class="table-title">Sampling History</div>
-          <div class="table-subtitle" id="historyCount">No records</div>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="history-table" id="historyTableBody">
-          <thead>
+          <tbody>
             <tr>
-              <th>Date/Time</th>
-              <th>Product</th>
-              <th>Lot Size</th>
-              <th>Defects</th>
-              <th>Sample</th>
-              <th>Decision</th>
-              <th>Action</th>
+              <td>2-8</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>13/0/1</td>
+              <td>5/0/1</td>
+              <td>2/0/1</td>
+              <td>2/0/1</td>
             </tr>
-          </thead>
-          <tbody id="historyRows"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="table-wrap" id="tabGuide" style="display:none;">
-      <div class="table-header">
-        <div>
-          <div class="table-title">Industry Reference</div>
-          <div class="table-subtitle">Recommended AQL levels by industry</div>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
             <tr>
-              <th>Industry</th>
-              <th>Critical</th>
-              <th>Major</th>
-              <th>Minor</th>
-              <th>Level</th>
+              <td>9-15</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>13/0/1</td>
+              <td>5/0/1</td>
+              <td>3/0/1</td>
+              <td>3/1/2</td>
             </tr>
-          </thead>
-          <tbody id="guideBody"></tbody>
+            <tr>
+              <td>16-25</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>13/0/1</td>
+              <td>5/0/1</td>
+              <td>5/1/2</td>
+              <td>5/2/3</td>
+            </tr>
+            <tr>
+              <td>26-50</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>8/0/1</td>
+              <td>8/0/1</td>
+              <td>8/1/2</td>
+              <td>8/3/4</td>
+            </tr>
+            <tr>
+              <td>51-90</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>13/0/1</td>
+              <td>13/0/1</td>
+              <td>13/2/3</td>
+              <td>13/5/6</td>
+            </tr>
+            <tr>
+              <td>91-150</td>
+              <td>88/0/1</td>
+              <td>28/0/1</td>
+              <td>20/0/1</td>
+              <td>20/0/1</td>
+              <td>20/3/4</td>
+              <td>28/7/8</td>
+            </tr>
+            <tr>
+              <td>151-280</td>
+              <td>88/0/1</td>
+              <td>32/0/1</td>
+              <td>32/0/1</td>
+              <td>32/1/2</td>
+              <td>32/5/6</td>
+              <td>32/10/11</td>
+            </tr>
+            <tr>
+              <td>281-500</td>
+              <td>88/0/1</td>
+              <td>50/0/1</td>
+              <td>50/1/2</td>
+              <td>50/2/3</td>
+              <td>50/8/9</td>
+              <td>50/14/15</td>
+            </tr>
+            <tr>
+              <td>501-1200</td>
+              <td>88/0/1</td>
+              <td>80/0/1</td>
+              <td>80/1/2</td>
+              <td>80/5/6</td>
+              <td>80/14/15</td>
+              <td>88/21/22</td>
+            </tr>
+            <tr>
+              <td>1201-3200</td>
+              <td>125/0/1</td>
+              <td>125/1/2</td>
+              <td>125/2/3</td>
+              <td>125/7/8</td>
+              <td>125/21/22</td>
+              <td>125/21/22</td>
+            </tr>
+            <tr>
+              <td>3201-10000</td>
+              <td>288/1/2</td>
+              <td>288/3/4</td>
+              <td>288/5/6</td>
+              <td>288/14/15</td>
+              <td>288/21/22</td>
+              <td>288/21/22</td>
+            </tr>
+            <tr>
+              <td>10001+</td>
+              <td>315/2/3</td>
+              <td>315/5/6</td>
+              <td>315/8/9</td>
+              <td>315/21/22</td>
+              <td>315/21/22</td>
+              <td>315/21/22</td>
+            </tr>
+          </tbody>
         </table>
       </div>
+      <p style="margin-top: 10px; font-size: 10px; color: #8b90a5;">
+        Format: Sample Size/Ac/Re | Reference: ANSI/ASQ Z1.4-2023
+      </p>
     </div>
-
   </div>
 </div>
 
-<!-- Hidden Report Capture Area -->
-<div id="reportCapture" style="background: white; padding: 20px; font-family: 'Sarabun', sans-serif;">
-  <!-- Report HTML will be generated here -->
-</div>
-
-<div class="toast" id="toast"></div>
-
 <script>
+const industries = {
+  pharma: { aql: "0.065", label: "🍱 Food/Pharma - Critical (AQL 0.065)" },
+  auto: { aql: "0.25", label: "🚗 Automotive - Strict (AQL 0.25)" },
+  medical: { aql: "0.25", label: "🏥 Medical Device - Strict (AQL 0.25)" },
+  consumer: { aql: "0.40", label: "👕 Consumer - Standard (AQL 0.40)" },
+  electronics: { aql: "0.40", label: "📱 Electronics - Standard (AQL 0.40)" },
+  cosmetic: { aql: "2.5", label: "💄 Cosmetics - Relaxed (AQL 2.5)" },
+  textile: { aql: "1.0", label: "🧵 Textile - Moderate (AQL 1.0)" }
+};
+
 const codeLetter = {
   "2-8": ["A","A","A","A","A","A","B"],
   "9-15": ["A","A","A","A","A","B","C"],
@@ -838,51 +314,47 @@ const codeLetter = {
 const sampleSizes = {
   A:2, B:3, C:5, D:8, E:13, F:20, G:32, H:50, J:80, K:125, L:200, M:315, N:500, P:800, Q:1250, R:2000
 };
+
 const codeOrder = ["A","B","C","D","E","F","G","H","J","K","L","M","N","P","Q","R"];
 
 const acReTable = {
-  A: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[null],"2.5":[0,1],"4.0":[0,1],"6.5":[0,1]},
-  B: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[null],"1.5":[0,1],"2.5":[0,1],"4.0":[0,1],"6.5":[1,2]},
-  C: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[null],"1.0":[0,1],"1.5":[0,1],"2.5":[0,1],"4.0":[1,2],"6.5":[2,3]},
-  D: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[null],"0.65":[0,1],"1.0":[0,1],"1.5":[0,1],"2.5":[1,2],"4.0":[2,3],"6.5":[3,4]},
-  E: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[null],"0.40":[0,1],"0.65":[0,1],"1.0":[0,1],"1.5":[1,2],"2.5":[2,3],"4.0":[3,4],"6.5":[5,6]},
-  F: {"0.065":[null],"0.10":[null],"0.15":[null],"0.25":[0,1],"0.40":[0,1],"0.65":[0,1],"1.0":[1,2],"1.5":[2,3],"2.5":[3,4],"4.0":[5,6],"6.5":[7,8]},
-  G: {"0.065":[null],"0.10":[null],"0.15":[0,1],"0.25":[0,1],"0.40":[0,1],"0.65":[1,2],"1.0":[2,3],"1.5":[3,4],"2.5":[5,6],"4.0":[7,8],"6.5":[10,11]},
-  H: {"0.065":[null],"0.10":[0,1],"0.15":[0,1],"0.25":[0,1],"0.40":[1,2],"0.65":[2,3],"1.0":[3,4],"1.5":[5,6],"2.5":[7,8],"4.0":[10,11],"6.5":[14,15]},
-  J: {"0.065":[0,1],"0.10":[0,1],"0.15":[0,1],"0.25":[1,2],"0.40":[1,2],"0.65":[3,4],"1.0":[5,6],"1.5":[7,8],"2.5":[10,11],"4.0":[14,15],"6.5":[21,22]},
-  K: {"0.065":[0,1],"0.10":[0,1],"0.15":[1,2],"0.25":[1,2],"0.40":[2,3],"0.65":[5,6],"1.0":[7,8],"1.5":[10,11],"2.5":[14,15],"4.0":[21,22],"6.5":[21,22]},
-  L: {"0.065":[0,1],"0.10":[1,2],"0.15":[1,2],"0.25":[2,3],"0.40":[3,4],"0.65":[7,8],"1.0":[10,11],"1.5":[14,15],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
-  M: {"0.065":[1,2],"0.10":[1,2],"0.15":[2,3],"0.25":[3,4],"0.40":[5,6],"0.65":[10,11],"1.0":[14,15],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
-  N: {"0.065":[1,2],"0.10":[2,3],"0.15":[3,4],"0.25":[5,6],"0.40":[7,8],"0.65":[14,15],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
-  P: {"0.065":[2,3],"0.10":[3,4],"0.15":[5,6],"0.25":[7,8],"0.40":[10,11],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
-  Q: {"0.065":[3,4],"0.10":[5,6],"0.15":[7,8],"0.25":[10,11],"0.40":[14,15],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]},
-  R: {"0.065":[5,6],"0.10":[7,8],"0.15":[10,11],"0.25":[14,15],"0.40":[21,22],"0.65":[21,22],"1.0":[21,22],"1.5":[21,22],"2.5":[21,22],"4.0":[21,22],"6.5":[21,22]}
+  A: {"0.065":[null],"0.25":[null],"0.40":[null],"1.0":[null],"2.5":[0,1],"4.0":[0,1]},
+  B: {"0.065":[null],"0.25":[null],"0.40":[null],"1.0":[null],"2.5":[0,1],"4.0":[0,1]},
+  C: {"0.065":[null],"0.25":[null],"0.40":[null],"1.0":[0,1],"2.5":[0,1],"4.0":[1,2]},
+  D: {"0.065":[null],"0.25":[null],"0.40":[0,1],"1.0":[0,1],"2.5":[1,2],"4.0":[2,3]},
+  E: {"0.065":[null],"0.25":[null],"0.40":[0,1],"1.0":[0,1],"2.5":[2,3],"4.0":[3,4]},
+  F: {"0.065":[null],"0.25":[0,1],"0.40":[0,1],"1.0":[1,2],"2.5":[3,4],"4.0":[5,6]},
+  G: {"0.065":[null],"0.25":[0,1],"0.40":[0,1],"1.0":[2,3],"2.5":[5,6],"4.0":[7,8]},
+  H: {"0.065":[null],"0.25":[0,1],"0.40":[1,2],"1.0":[3,4],"2.5":[7,8],"4.0":[10,11]},
+  J: {"0.065":[0,1],"0.25":[1,2],"0.40":[1,2],"1.0":[5,6],"2.5":[10,11],"4.0":[14,15]},
+  K: {"0.065":[0,1],"0.25":[1,2],"0.40":[2,3],"1.0":[7,8],"2.5":[14,15],"4.0":[21,22]},
+  L: {"0.065":[0,1],"0.25":[2,3],"0.40":[3,4],"1.0":[10,11],"2.5":[21,22],"4.0":[21,22]},
+  M: {"0.065":[1,2],"0.25":[3,4],"0.40":[5,6],"1.0":[14,15],"2.5":[21,22],"4.0":[21,22]},
+  N: {"0.065":[1,2],"0.25":[5,6],"0.40":[7,8],"1.0":[21,22],"2.5":[21,22],"4.0":[21,22]},
+  P: {"0.065":[2,3],"0.25":[7,8],"0.40":[10,11],"1.0":[21,22],"2.5":[21,22],"4.0":[21,22]},
+  Q: {"0.065":[3,4],"0.25":[10,11],"0.40":[14,15],"1.0":[21,22],"2.5":[21,22],"4.0":[21,22]},
+  R: {"0.065":[5,6],"0.25":[14,15],"0.40":[21,22],"1.0":[21,22],"2.5":[21,22],"4.0":[21,22]}
 };
 
-const inspLevelIndex = { S1:0, S2:1, S3:2, S4:3, I:4, II:5, III:6 };
-const aqlLevels = ["0.065","0.10","0.15","0.25","0.40","0.65","1.0","1.5","2.5","4.0","6.5"];
-const lotRanges = ["2-8","9-15","16-25","26-50","51-90","91-150","151-280","281-500","501-1200","1201-3200","3201-10000","10001-35000","35001-150000","150001-500000","500001+"];
-
-let samplingHistory = JSON.parse(localStorage.getItem('samplingHistory')) || [];
 let lastResult = null;
 
-function setPreset(aql, level) {
-  document.getElementById("aqlLevel").value = aql.toString();
-  document.getElementById("inspLevel").value = level;
-  toast(`Preset: AQL ${aql} (${level})`,"success");
-}
-
-function resolveAcRe(startCode, aql) {
-  let idx = codeOrder.indexOf(startCode);
-  while (idx < codeOrder.length) {
-    const code = codeOrder[idx];
-    const val = acReTable[code][aql];
-    if (val && val[0] !== null) {
-      return { ss: sampleSizes[code], ac: val[0], re: val[1], resolvedCode: code };
-    }
-    idx++;
+function setIndustryAQL() {
+  const industry = document.getElementById("industry").value;
+  if (!industry) {
+    document.getElementById("industryInfo").style.display = "none";
+    return;
   }
-  return null;
+  
+  if (industry === "custom") {
+    document.getElementById("industryInfo").style.display = "none";
+    document.getElementById("aql").value = "";
+    return;
+  }
+  
+  const ind = industries[industry];
+  document.getElementById("aql").value = ind.aql;
+  document.getElementById("industryBadge").textContent = ind.label;
+  document.getElementById("industryInfo").style.display = "block";
 }
 
 function getLotRange(n) {
@@ -904,460 +376,255 @@ function getLotRange(n) {
   return null;
 }
 
-function calculate() {
-  const aql = document.getElementById("aqlLevel").value;
-  const level = document.getElementById("inspLevel").value;
-  const lotStr = document.getElementById("lotSize").value.trim();
-  const defStr = document.getElementById("defects").value.trim();
-
-  if (!aql) return toast("Select AQL level","error");
-  if (!lotStr) return toast("Enter Lot Size","error");
-
-  const lot = parseInt(lotStr);
-  if (isNaN(lot) || lot < 2) return toast("Lot Size ≥ 2 required","error");
-
-  const defects = parseInt(defStr) || 0;
-  const lotRange = getLotRange(lot);
-  if (!lotRange) return toast("Lot Size out of range","error");
-
-  const levelIdx = inspLevelIndex[level];
-  const startCode = codeLetter[lotRange][levelIdx];
-  const result = resolveAcRe(startCode, aql);
-
-  if (!result) return toast("No plan for this combination","error");
-
-  const { ss, ac, re } = result;
-
-  const fi = document.getElementById("fullInspect");
-  if (ss >= lot) {
-    fi.classList.add("show");
-  } else {
-    fi.classList.remove("show");
+function resolveAcRe(startCode, aql) {
+  let idx = codeOrder.indexOf(startCode);
+  while (idx < codeOrder.length) {
+    const code = codeOrder[idx];
+    const val = acReTable[code][aql];
+    if (val && val[0] !== null) {
+      return { ss: sampleSizes[code], ac: val[0], re: val[1] };
+    }
+    idx++;
   }
+  return null;
+}
 
-  document.getElementById("resSS").textContent = ss >= lot ? lot + " (100%)" : ss;
-  document.getElementById("resAc").textContent = ac;
-  document.getElementById("resRe").textContent = re;
-  document.querySelectorAll(".stat-card").forEach(c => c.classList.add("active"));
-
+function calculate() {
+  const aql = document.getElementById("aql").value;
+  const lotStr = document.getElementById("lotSize").value;
+  
+  if (!aql) { alert("Select AQL Level or Industry Type"); return; }
+  if (!lotStr) { alert("Enter Lot Size"); return; }
+  
+  const lot = parseInt(lotStr);
+  const defects = parseInt(document.getElementById("defects").value) || 0;
+  const lotRange = getLotRange(lot);
+  
+  if (!lotRange) { alert("Lot Size out of range"); return; }
+  
+  const startCode = codeLetter[lotRange][5];
+  const result = resolveAcRe(startCode, aql);
+  
+  if (!result) { alert("No plan for this AQL"); return; }
+  
+  const { ss, ac, re } = result;
+  
+  document.getElementById("ss").textContent = ss;
+  document.getElementById("ac").textContent = ac;
+  document.getElementById("re").textContent = re;
+  
   const dec = document.getElementById("decision");
   if (defects <= ac) {
     dec.className = "decision accept";
-    dec.innerHTML = `✅ ACCEPT<div class="decision-sub">Defects ${defects} ≤ Ac ${ac}</div>`;
+    dec.textContent = `✅ ACCEPT (Defects ${defects} ≤ Ac ${ac})`;
   } else if (defects >= re) {
     dec.className = "decision reject";
-    dec.innerHTML = `❌ REJECT<div class="decision-sub">Defects ${defects} ≥ Re ${re}</div>`;
+    dec.textContent = `❌ REJECT (Defects ${defects} ≥ Re ${re})`;
   } else {
     dec.className = "decision pending";
-    dec.innerHTML = `⚠️ BETWEEN<div class="decision-sub">${ac} < Defects ${defects} < ${re}</div>`;
+    dec.textContent = `⚠️ BETWEEN (${ac} < Defects ${defects} < ${re})`;
   }
-
-  document.getElementById("saveBtn").style.display = "block";
-  document.getElementById("exportBtn").style.display = "block";
-
+  
+  document.getElementById("result").style.display = "block";
+  
   lastResult = {
-    aql, level, lot, defects, ss, ac, re,
-    product: document.getElementById("productName").value || "Unnamed",
-    company: document.getElementById("companyName").value || "N/A",
-    inspector: document.getElementById("inspectorName").value || "N/A",
-    department: document.getElementById("department").value || "QC"
+    company: document.getElementById("company").value || "N/A",
+    inspector: document.getElementById("inspector").value || "N/A",
+    department: document.getElementById("department").value || "QC",
+    product: document.getElementById("product").value || "Unnamed",
+    aql, lot, defects, ss, ac, re,
+    decision: defects <= ac ? "ACCEPT" : defects >= re ? "REJECT" : "BETWEEN"
   };
-
-  toast(`Lot ${lot} → Sample ${ss}, Ac ${ac}, Re ${re}`,"success");
 }
 
-function saveToHistory() {
-  if (!lastResult) {
-    toast("No result to save","error");
-    return;
-  }
-
-  const record = {
-    id: Date.now(),
-    timestamp: new Date().toLocaleString('th-TH'),
-    product: lastResult.product,
-    lot: lastResult.lot,
-    defects: lastResult.defects,
-    ss: lastResult.ss,
-    decision: lastResult.defects <= lastResult.ac ? "ACCEPT" : lastResult.defects >= lastResult.re ? "REJECT" : "BETWEEN",
-    aql: lastResult.aql,
-    ac: lastResult.ac,
-    re: lastResult.re,
-    ...lastResult
-  };
-
-  samplingHistory.unshift(record);
-  localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
-  loadHistory();
-  toast("Result saved","success");
-}
-
-function loadHistory() {
-  const tbody = document.getElementById("historyRows");
-  tbody.innerHTML = "";
-
-  if (samplingHistory.length === 0) {
-    document.getElementById("historyCount").textContent = "No records";
-    return;
-  }
-
-  document.getElementById("historyCount").textContent = `${samplingHistory.length} record(s)`;
-
-  samplingHistory.forEach(record => {
-    const row = document.createElement("tr");
-    const decisionColor = record.decision === "ACCEPT" ? "#22c55e" : record.decision === "REJECT" ? "#ef4444" : "#f59e0b";
-    row.innerHTML = `
-      <td>${record.timestamp}</td>
-      <td>${record.product}</td>
-      <td>${record.lot}</td>
-      <td>${record.defects}</td>
-      <td>${record.ss}</td>
-      <td><span style="color:${decisionColor}; font-weight:bold;">${record.decision}</span></td>
-      <td>
-        <button class="action-btn" onclick="exportRecordPDF(${record.id})">PDF</button>
-        <button class="action-btn action-btn-delete" onclick="deleteRecord(${record.id})">Del</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-function deleteRecord(id) {
-  if (confirm("Delete record?")) {
-    samplingHistory = samplingHistory.filter(r => r.id !== id);
-    localStorage.setItem('samplingHistory', JSON.stringify(samplingHistory));
-    loadHistory();
-    toast("Deleted","success");
-  }
-}
-
-function clearAll() {
-  document.getElementById("aqlLevel").value = "";
-  document.getElementById("inspLevel").value = "II";
+function clearForm() {
+  document.getElementById("company").value = "";
+  document.getElementById("inspector").value = "";
+  document.getElementById("department").value = "";
+  document.getElementById("product").value = "";
+  document.getElementById("industry").value = "";
+  document.getElementById("aql").value = "";
   document.getElementById("lotSize").value = "";
   document.getElementById("defects").value = "0";
-  document.getElementById("productName").value = "";
-  document.getElementById("resSS").textContent = "—";
-  document.getElementById("resAc").textContent = "—";
-  document.getElementById("resRe").textContent = "—";
-  document.getElementById("decision").className = "decision pending";
-  document.getElementById("decision").innerHTML = "⏳ Waiting for input";
-  document.getElementById("fullInspect").classList.remove("show");
-  document.querySelectorAll(".stat-card").forEach(c => c.classList.remove("active"));
-  document.getElementById("saveBtn").style.display = "none";
-  document.getElementById("exportBtn").style.display = "none";
+  document.getElementById("result").style.display = "none";
+  document.getElementById("industryInfo").style.display = "none";
   lastResult = null;
 }
 
-async function exportDashboardPDF() {
-  if (!lastResult) {
-    toast("No result to export","error");
-    return;
-  }
-
+function exportPDF() {
+  if (!lastResult) { alert("No result to export"); return; }
+  
   try {
-    toast("Generating report...","success");
-    
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
-
+    const doc = new jsPDF();
+    
     let yPos = 15;
-    const pageHeight = pdf.internal.pageSize.height;
-    const fontSize = 10;
-
+    
     // Header
-    pdf.setFontSize(16);
-    pdf.setTextColor(0, 51, 102);
-    pdf.setFont(undefined, 'bold');
-    pdf.text("AQL Sampling Inspection Report", 105, yPos, { align: 'center' });
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 102);
+    doc.text("AQL Sampling Inspection Report", 105, yPos, { align: "center" });
     
     yPos += 8;
-    pdf.setFontSize(14);
-    pdf.setTextColor(0, 68, 153);
-    pdf.text(lastResult.company || "Quality Control", 105, yPos, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(lastResult.company, 105, yPos, { align: "center" });
     
-    yPos += 6;
-    pdf.setFontSize(9);
-    pdf.setTextColor(100, 100, 100);
-    pdf.setFont(undefined, 'normal');
-    pdf.text("ANSI/ASQ Z1.4 - ISO 2859-1:2023", 105, yPos, { align: 'center' });
+    yPos += 7;
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text("ANSI/ASQ Z1.4 - ISO 2859-1:2023", 105, yPos, { align: "center" });
     
-    yPos += 12;
-    pdf.setDrawColor(0, 51, 102);
-    pdf.line(10, yPos - 2, 200, yPos - 2);
+    yPos += 10;
+    doc.setDrawColor(0, 51, 102);
+    doc.line(10, yPos, 200, yPos);
+    
     yPos += 8;
-
-    // Section 1: Inspection Information
-    pdf.setFontSize(11);
-    pdf.setTextColor(0, 51, 102);
-    pdf.setFont(undefined, 'bold');
-    pdf.text("INSPECTION INFORMATION", 15, yPos);
-    yPos += 8;
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text("INSPECTION INFORMATION", 15, yPos);
     
-    pdf.setFont(undefined, 'normal');
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(9);
-
-    const infoData = [
-      ["Company:", lastResult.company || "N/A"],
-      ["Date:", new Date().toLocaleDateString('th-TH')],
-      ["Time:", new Date().toLocaleTimeString('th-TH')],
-      ["Inspector:", lastResult.inspector || "N/A"],
-      ["Department:", lastResult.department || "QC"],
-      ["Product:", lastResult.product || "Unnamed"]
+    yPos += 7;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    
+    const data = [
+      ["Company:", lastResult.company],
+      ["Date:", new Date().toLocaleDateString("th-TH")],
+      ["Inspector:", lastResult.inspector],
+      ["Department:", lastResult.department],
+      ["Product:", lastResult.product]
     ];
-
-    infoData.forEach(([label, value]) => {
-      pdf.setFont(undefined, 'bold');
-      pdf.text(label, 15, yPos);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(value, 70, yPos);
+    
+    data.forEach(([label, value]) => {
+      doc.setFont(undefined, "bold");
+      doc.text(label, 15, yPos);
+      doc.setFont(undefined, "normal");
+      doc.text(value, 70, yPos);
       yPos += 6;
     });
-
-    yPos += 4;
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(10, yPos, 200, yPos);
-    yPos += 8;
-
-    // Section 2: Sampling Plan
-    pdf.setFontSize(11);
-    pdf.setTextColor(0, 51, 102);
-    pdf.setFont(undefined, 'bold');
-    pdf.text("SAMPLING PLAN", 15, yPos);
-    yPos += 8;
     
-    pdf.setFont(undefined, 'normal');
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(9);
-
+    yPos += 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(10, yPos, 200, yPos);
+    
+    yPos += 8;
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text("SAMPLING PLAN & RESULTS", 15, yPos);
+    
+    yPos += 7;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    
     const planData = [
       ["AQL Level:", lastResult.aql],
-      ["Inspection Level:", `Level ${lastResult.level}`],
-      ["Lot Size:", lastResult.lot.toString()],
-      ["Sample Size:", lastResult.ss.toString()],
-      ["Accept (Ac):", lastResult.ac.toString()],
-      ["Reject (Re):", lastResult.re.toString()]
+      ["Lot Size:", lastResult.lot],
+      ["Sample Size:", lastResult.ss],
+      ["Accept (Ac):", lastResult.ac],
+      ["Reject (Re):", lastResult.re],
+      ["Defects Found:", lastResult.defects]
     ];
-
+    
     planData.forEach(([label, value]) => {
-      pdf.setFont(undefined, 'bold');
-      pdf.text(label, 15, yPos);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(value, 70, yPos);
+      doc.setFont(undefined, "bold");
+      doc.text(label, 15, yPos);
+      doc.setFont(undefined, "normal");
+      doc.text(value.toString(), 70, yPos);
       yPos += 6;
     });
-
-    yPos += 4;
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(10, yPos, 200, yPos);
-    yPos += 8;
-
-    // Section 3: Inspection Results
-    pdf.setFontSize(11);
-    pdf.setTextColor(0, 51, 102);
-    pdf.setFont(undefined, 'bold');
-    pdf.text("INSPECTION RESULTS", 15, yPos);
+    
     yPos += 8;
     
-    pdf.setFont(undefined, 'normal');
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(9);
-
-    const resultData = [
-      ["Samples Inspected:", `${lastResult.ss} pieces`],
-      ["Defects Found:", `${lastResult.defects} pieces`],
-      ["Defect Rate:", `${((lastResult.defects / lastResult.ss * 100).toFixed(1))}%`]
-    ];
-
-    resultData.forEach(([label, value]) => {
-      pdf.setFont(undefined, 'bold');
-      pdf.text(label, 15, yPos);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(value, 70, yPos);
-      yPos += 6;
-    });
-
-    yPos += 6;
-
     // Decision Box
-    let decisionText, bgColor, textColor;
-    if (lastResult.defects <= lastResult.ac) {
-      decisionText = `ACCEPT ✓\nDefects ${lastResult.defects} ≤ Ac ${lastResult.ac}`;
-      bgColor = [34, 197, 94];
-    } else if (lastResult.defects >= lastResult.re) {
-      decisionText = `REJECT ✗\nDefects ${lastResult.defects} ≥ Re ${lastResult.re}`;
-      bgColor = [239, 68, 68];
-    } else {
-      decisionText = `BETWEEN ⚠\n${lastResult.ac} < Defects ${lastResult.defects} < ${lastResult.re}`;
-      bgColor = [245, 158, 11];
-    }
-
-    pdf.setFillColor(...bgColor);
-    pdf.rect(15, yPos, 180, 18, 'F');
+    const colors = {
+      ACCEPT: [34, 197, 94],
+      REJECT: [239, 68, 68],
+      BETWEEN: [245, 158, 11]
+    };
     
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(12);
-    pdf.setFont(undefined, 'bold');
-    pdf.text("DECISION", 105, yPos + 5, { align: 'center' });
+    const color = colors[lastResult.decision];
+    doc.setFillColor(...color);
+    doc.rect(15, yPos, 180, 15, "F");
     
-    pdf.setFontSize(10);
-    pdf.setFont(undefined, 'normal');
-    pdf.text(decisionText.split('\n')[0], 105, yPos + 10, { align: 'center' });
-    pdf.text(decisionText.split('\n')[1], 105, yPos + 14, { align: 'center' });
-
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    const decisionText = lastResult.decision === "ACCEPT" ? "✅ ACCEPT" : lastResult.decision === "REJECT" ? "❌ REJECT" : "⚠️ BETWEEN";
+    doc.text(decisionText, 105, yPos + 10, { align: "center" });
+    
+    yPos += 22;
+    
+    // Approval Section
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.setFont(undefined, "bold");
+    doc.text("APPROVAL & SIGNATURE", 15, yPos);
+    
+    yPos += 8;
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, "normal");
+    doc.text("Inspector Signature:", 15, yPos);
+    doc.line(80, yPos + 1, 130, yPos + 1);
+    doc.text("Date:", 140, yPos);
+    doc.line(155, yPos + 1, 190, yPos + 1);
+    
+    yPos += 12;
+    doc.text("Approved By:", 15, yPos);
+    doc.line(80, yPos + 1, 130, yPos + 1);
+    doc.text("Date:", 140, yPos);
+    doc.line(155, yPos + 1, 190, yPos + 1);
+    
+    yPos += 12;
+    doc.text("Department Head:", 15, yPos);
+    doc.line(80, yPos + 1, 130, yPos + 1);
+    doc.text("Date:", 140, yPos);
+    doc.line(155, yPos + 1, 190, yPos + 1);
+    
+    yPos += 15;
+    
+    // AQL Standard Reference
+    doc.setFontSize(9);
+    doc.setTextColor(0, 51, 102);
+    doc.setFont(undefined, "bold");
+    doc.text("AQL STANDARD REFERENCE", 15, yPos);
+    
+    yPos += 6;
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(50, 50, 50);
+    
+    const references = [
+      "• Standard: ANSI/ASQ Z1.4 (Sampling Procedures and Tables for Inspection by Attributes)",
+      "• Edition: 2023 / ISO 2859-1:2023",
+      "• Inspection Level: Level II (Normal Inspection)",
+      "• AQL Level: " + lastResult.aql + " (Acceptable Quality Level)",
+      "• Definition: Maximum percentage of nonconforming items considered acceptable",
+      "• Reference: American Society for Quality (ASQ) - www.asq.org"
+    ];
+    
+    references.forEach(ref => {
+      if (yPos > 270) return;
+      doc.text(ref, 15, yPos);
+      yPos += 4;
+    });
+    
     // Footer
-    pdf.setTextColor(150, 150, 150);
-    pdf.setFontSize(8);
-    pdf.text(`Generated: ${new Date().toLocaleString('th-TH')} | ANSI/ASQ Z1.4 - ISO 2859-1:2023`, 105, pageHeight - 10, { align: 'center' });
-
-    // Save PDF
-    pdf.save(`AQL_Report_${lastResult.lot}_${new Date().toISOString().slice(0,10)}.pdf`);
+    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(8);
+    doc.text(`Generated: ${new Date().toLocaleString("th-TH")} | ANSI/ASQ Z1.4 - ISO 2859-1:2023`, 105, 285, { align: "center" });
     
-    toast("PDF exported!","success");
-
+    doc.save(`AQL_Report_${lastResult.lot}_${new Date().toISOString().slice(0,10)}.pdf`);
+    alert("✅ PDF exported successfully!");
+    
   } catch (err) {
-    console.error("PDF error:", err);
-    toast("Error generating PDF","error");
+    console.error("PDF Error:", err);
+    alert(`Error: ${err.message}`);
   }
-}
-
-function exportRecordPDF(id) {
-  const record = samplingHistory.find(r => r.id === id);
-  if (!record) return;
-
-  try {
-    toast("Generating PDF...","success");
-
-    const reportHTML = `
-      <div style="color: #333;">
-        <div style="text-align: center; border-bottom: 3px solid #003366; padding-bottom: 15px; margin-bottom: 20px;">
-          <h1 style="color: #003366; margin: 0; font-size: 24px;">${record.company}</h1>
-          <h2 style="color: #004499; margin: 5px 0; font-size: 18px;">AQL Sampling Inspection Report</h2>
-        </div>
-
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-          <tr><td style="font-weight: bold; width: 30%;">Date:</td><td>${record.timestamp}</td></tr>
-          <tr><td style="font-weight: bold;">Inspector:</td><td>${record.inspector}</td></tr>
-          <tr><td style="font-weight: bold;">Product:</td><td>${record.product}</td></tr>
-          <tr><td style="font-weight: bold;">AQL:</td><td>${record.aql}</td></tr>
-          <tr><td style="font-weight: bold;">Lot Size:</td><td>${record.lot}</td></tr>
-          <tr><td style="font-weight: bold;">Sample Size:</td><td>${record.ss}</td></tr>
-          <tr><td style="font-weight: bold;">Defects:</td><td>${record.defects}</td></tr>
-          <tr><td style="font-weight: bold;">Accept (Ac):</td><td>${record.ac}</td></tr>
-          <tr><td style="font-weight: bold;">Reject (Re):</td><td>${record.re}</td></tr>
-        </table>
-
-        <div style="text-align: center; padding: 15px; border-radius: 8px; background: ${record.decision === 'ACCEPT' ? '#22c55e' : record.decision === 'REJECT' ? '#ef4444' : '#f59e0b'}; color: white; font-weight: bold; font-size: 18px;">
-          ${record.decision}
-        </div>
-
-        <p style="margin-top: 20px; color: #999; font-size: 11px; text-align: center;">
-          ${record.timestamp}
-        </p>
-      </div>
-    `;
-
-    document.getElementById("reportCapture").innerHTML = reportHTML;
-
-    html2canvas(document.getElementById("reportCapture"), {
-      scale: 2,
-      backgroundColor: '#ffffff'
-    }).then(canvas => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`AQL_Report_${record.lot}_${record.timestamp.replace(/\//g, '-').slice(0, 10)}.pdf`);
-
-      toast("PDF saved!","success");
-    });
-
-  } catch (err) {
-    console.error("Export error:", err);
-    toast("Error","error");
-  }
-}
-
-function switchTab(tab) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  event.target.classList.add("active");
-  document.getElementById("tabReference").style.display = tab === "reference" ? "block" : "none";
-  document.getElementById("tabHistory").style.display = tab === "history" ? "block" : "none";
-  document.getElementById("tabGuide").style.display = tab === "guide" ? "block" : "none";
-}
-
-function toast(msg, type) {
-  const t = document.getElementById("toast");
-  t.textContent = (type === "success" ? "✅ " : "❌ ") + msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-function renderFullTable() {
-  const tbody = document.getElementById("fullBody");
-  tbody.innerHTML = "";
-
-  lotRanges.forEach(range => {
-    const tr = document.createElement("tr");
-    let html = `<td>${range}</td>`;
-
-    aqlLevels.forEach(aql => {
-      const code = codeLetter[range][5];
-      const result = resolveAcRe(code, aql);
-      if (result) {
-        html += `<td>${result.ss}/${result.ac}/${result.re}</td>`;
-      } else {
-        html += `<td style="color:var(--text2)">—</td>`;
-      }
-    });
-
-    tr.innerHTML = html;
-    tbody.appendChild(tr);
-  });
-}
-
-function renderGuideTable() {
-  const tbody = document.getElementById("guideBody");
-  const data = [
-    ["🍱 Food & Beverage","0.065","0.40","2.5","Level II"],
-    ["💊 Pharmaceutical","0.065","0.25","1.0","Level II"],
-    ["🏥 Medical Device","0.065","0.25","1.0","Level II"],
-    ["🚗 Automotive","0.065","0.25","1.0","Level II"],
-    ["✈️ Aerospace","0.065","0.10","0.65","Level III"],
-    ["📱 Electronics","0.065","0.40","2.5","Level II"],
-    ["🧴 Cosmetics","0.065","0.65","2.5","Level II"],
-    ["👕 Textile","0.065","1.0","2.5","Level II"],
-    ["🧪 Plastic Injection","0.065","0.40","2.5","Level II"],
-  ];
-
-  data.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = row.map((c,i) => i===0 ? `<td style="text-align:left;">${c}</td>` : `<td>${c}</td>`).join("");
-    tbody.appendChild(tr);
-  });
 }
 
 document.getElementById("lotSize").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
-document.getElementById("defects").addEventListener("keypress", e => { if(e.key==="Enter") calculate(); });
-
-window.addEventListener("load", () => {
-  renderFullTable();
-  renderGuideTable();
-  loadHistory();
-});
 </script>
+
 </body>
 </html>
