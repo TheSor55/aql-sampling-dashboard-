@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AQL Sampling Dashboard - Universal QC Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg: #0f1117;
@@ -562,20 +563,8 @@ tr:hover td {
   display: block;
 }
 
-.pdf-container {
+#reportCapture {
   display: none;
-  width: 210mm;
-  height: 297mm;
-  background: white;
-  color: black;
-  font-family: 'Sarabun', serif;
-  padding: 15mm;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.pdf-container.show {
-  display: block;
 }
 
 @media (max-width: 900px) {
@@ -723,7 +712,7 @@ tr:hover td {
         <button class="btn btn-success btn-sm" onclick="saveToHistory()" id="saveBtn" style="display:none;">
           💾 Save Result
         </button>
-        <button class="btn btn-success btn-sm" onclick="exportPDF()" id="exportBtn" style="display:none; grid-column:auto;">
+        <button class="btn btn-success btn-sm" onclick="exportDashboardPDF()" id="exportBtn" style="display:none; grid-column:auto;">
           📥 Export PDF
         </button>
       </div>
@@ -773,7 +762,7 @@ tr:hover td {
       <div class="table-header">
         <div>
           <div class="table-title">Sampling History</div>
-          <div class="table-subtitle" id="historyCount">No records yet</div>
+          <div class="table-subtitle" id="historyCount">No records</div>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -820,93 +809,9 @@ tr:hover td {
   </div>
 </div>
 
-<!-- PDF TEMPLATE (Hidden) -->
-<div class="pdf-container" id="pdfContent">
-  <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #003366; padding-bottom: 10px;">
-    <div style="font-size: 18px; font-weight: bold; color: #003366;" id="pdfCompanyName"></div>
-    <div style="font-size: 14px; font-weight: bold; color: #004499; margin-top: 5px;">AQL Sampling Inspection Report</div>
-    <div style="font-size: 12px; color: #666; margin-top: 3px;">ANSI/ASQ Z1.4 - ISO 2859-1:2023</div>
-  </div>
-
-  <!-- ENGLISH SECTION -->
-  <div style="margin-bottom: 30px;">
-    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px;">1. INSPECTION INFORMATION</div>
-    <table style="width: 100%; margin-bottom: 10px;">
-      <tr><td style="font-weight: bold; width: 40%;">Company:</td><td id="pdfCompanyEng"></td></tr>
-      <tr><td style="font-weight: bold;">Date:</td><td id="pdfDateEng"></td></tr>
-      <tr><td style="font-weight: bold;">Inspector:</td><td id="pdfInspectorEng"></td></tr>
-      <tr><td style="font-weight: bold;">Department:</td><td id="pdfDepartmentEng"></td></tr>
-      <tr><td style="font-weight: bold;">Product Name:</td><td id="pdfProductEng"></td></tr>
-    </table>
-
-    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">2. SAMPLING PLAN</div>
-    <table style="width: 100%; margin-bottom: 10px;">
-      <tr><td style="font-weight: bold; width: 40%;">AQL Level:</td><td id="pdfAqlEng"></td></tr>
-      <tr><td style="font-weight: bold;">Inspection Level:</td><td id="pdfLevelEng"></td></tr>
-      <tr><td style="font-weight: bold;">Lot Size:</td><td id="pdfLotEng"></td></tr>
-      <tr><td style="font-weight: bold;">Sample Size:</td><td id="pdfSampleEng"></td></tr>
-      <tr><td style="font-weight: bold;">Accept (Ac):</td><td id="pdfAcEng"></td></tr>
-      <tr><td style="font-weight: bold;">Reject (Re):</td><td id="pdfReEng"></td></tr>
-    </table>
-
-    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">3. INSPECTION RESULTS</div>
-    <table style="width: 100%; margin-bottom: 10px;">
-      <tr><td style="font-weight: bold; width: 40%;">Samples Inspected:</td><td id="pdfSamplesEng"></td></tr>
-      <tr><td style="font-weight: bold;">Defects Found:</td><td id="pdfDefectsEng"></td></tr>
-      <tr><td style="font-weight: bold;">Defect Rate:</td><td id="pdfRateEng"></td></tr>
-      <tr><td style="font-weight: bold;">Acceptance Number (Ac):</td><td id="pdfAcValEng"></td></tr>
-      <tr><td style="font-weight: bold;">Rejection Number (Re):</td><td id="pdfReValEng"></td></tr>
-    </table>
-
-    <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">4. DECISION</div>
-    <div id="pdfDecisionEng" style="text-align: center; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 5px; margin-top: 10px;"></div>
-  </div>
-
-  <!-- THAI SECTION -->
-  <div style="page-break-before: avoid;">
-    <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #003366; padding-bottom: 10px;">
-      <div style="font-size: 18px; font-weight: bold; color: #003366;" id="pdfCompanyThai"></div>
-      <div style="font-size: 14px; font-weight: bold; color: #004499; margin-top: 5px;">รายงานผลการตรวจสอบ AQL</div>
-      <div style="font-size: 12px; color: #666; margin-top: 3px;">มาตรฐาน ANSI/ASQ Z1.4 - ISO 2859-1:2023</div>
-    </div>
-
-    <div style="margin-bottom: 30px;">
-      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px;">1. ข้อมูลการตรวจสอบ</div>
-      <table style="width: 100%; margin-bottom: 10px;">
-        <tr><td style="font-weight: bold; width: 40%;">บริษัท:</td><td id="pdfCompanyTh"></td></tr>
-        <tr><td style="font-weight: bold;">วันที่:</td><td id="pdfDateTh"></td></tr>
-        <tr><td style="font-weight: bold;">ผู้ตรวจสอบ:</td><td id="pdfInspectorTh"></td></tr>
-        <tr><td style="font-weight: bold;">แผนก:</td><td id="pdfDepartmentTh"></td></tr>
-        <tr><td style="font-weight: bold;">ชื่อสินค้า:</td><td id="pdfProductTh"></td></tr>
-      </table>
-
-      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">2. แผนการสุ่มตัวอย่าง</div>
-      <table style="width: 100%; margin-bottom: 10px;">
-        <tr><td style="font-weight: bold; width: 40%;">ระดับ AQL:</td><td id="pdfAqlTh"></td></tr>
-        <tr><td style="font-weight: bold;">ระดับการตรวจ:</td><td id="pdfLevelTh"></td></tr>
-        <tr><td style="font-weight: bold;">จำนวนลอต:</td><td id="pdfLotTh"></td></tr>
-        <tr><td style="font-weight: bold;">ขนาดตัวอย่าง:</td><td id="pdfSampleTh"></td></tr>
-        <tr><td style="font-weight: bold;">ยอมรับ (Ac):</td><td id="pdfAcTh"></td></tr>
-        <tr><td style="font-weight: bold;">ปฏิเสธ (Re):</td><td id="pdfReTh"></td></tr>
-      </table>
-
-      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">3. ผลการตรวจสอบ</div>
-      <table style="width: 100%; margin-bottom: 10px;">
-        <tr><td style="font-weight: bold; width: 40%;">ตัวอย่างที่ตรวจ:</td><td id="pdfSamplesTh"></td></tr>
-        <tr><td style="font-weight: bold;">ตำหนิที่พบ:</td><td id="pdfDefectsTh"></td></tr>
-        <tr><td style="font-weight: bold;">อัตราตำหนิ:</td><td id="pdfRateTh"></td></tr>
-        <tr><td style="font-weight: bold;">ยอมรับได้ (Ac):</td><td id="pdfAcValTh"></td></tr>
-        <tr><td style="font-weight: bold;">ปฏิเสธ (Re):</td><td id="pdfReValTh"></td></tr>
-      </table>
-
-      <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 10px; margin-top: 15px;">4. การตัดสินใจ</div>
-      <div id="pdfDecisionTh" style="text-align: center; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 5px; margin-top: 10px;"></div>
-    </div>
-  </div>
-
-  <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 11px; color: #999; text-align: center;">
-    <span id="pdfFooter"></span>
-  </div>
+<!-- Hidden Report Capture Area -->
+<div id="reportCapture" style="background: white; padding: 20px; font-family: 'Sarabun', sans-serif;">
+  <!-- Report HTML will be generated here -->
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1144,97 +1049,176 @@ function clearAll() {
   lastResult = null;
 }
 
-function fillPdfContent(result) {
-  const today = new Date();
-  const dateEng = today.toLocaleDateString('en-US');
-  const dateTh = today.toLocaleDateString('th-TH');
-
-  document.getElementById("pdfCompanyEng").textContent = result.company;
-  document.getElementById("pdfDateEng").textContent = dateEng;
-  document.getElementById("pdfInspectorEng").textContent = result.inspector;
-  document.getElementById("pdfDepartmentEng").textContent = result.department;
-  document.getElementById("pdfProductEng").textContent = result.product;
-  document.getElementById("pdfAqlEng").textContent = result.aql;
-  document.getElementById("pdfLevelEng").textContent = "Level II (Normal)";
-  document.getElementById("pdfLotEng").textContent = result.lot;
-  document.getElementById("pdfSampleEng").textContent = result.ss;
-  document.getElementById("pdfAcEng").textContent = result.ac;
-  document.getElementById("pdfReEng").textContent = result.re;
-  document.getElementById("pdfSamplesEng").textContent = result.ss + " pieces";
-  document.getElementById("pdfDefectsEng").textContent = result.defects + " pieces";
-  document.getElementById("pdfRateEng").textContent = ((result.defects / result.ss * 100).toFixed(1)) + "%";
-  document.getElementById("pdfAcValEng").textContent = result.ac;
-  document.getElementById("pdfReValEng").textContent = result.re;
-
-  document.getElementById("pdfCompanyTh").textContent = result.company;
-  document.getElementById("pdfDateTh").textContent = dateTh;
-  document.getElementById("pdfInspectorTh").textContent = result.inspector;
-  document.getElementById("pdfDepartmentTh").textContent = result.department;
-  document.getElementById("pdfProductTh").textContent = result.product;
-  document.getElementById("pdfAqlTh").textContent = result.aql;
-  document.getElementById("pdfLevelTh").textContent = "ระดับ II (ปกติ)";
-  document.getElementById("pdfLotTh").textContent = result.lot;
-  document.getElementById("pdfSampleTh").textContent = result.ss;
-  document.getElementById("pdfAcTh").textContent = result.ac;
-  document.getElementById("pdfReTh").textContent = result.re;
-  document.getElementById("pdfSamplesTh").textContent = result.ss + " ชิ้น";
-  document.getElementById("pdfDefectsTh").textContent = result.defects + " ชิ้น";
-  document.getElementById("pdfRateTh").textContent = ((result.defects / result.ss * 100).toFixed(1)) + "%";
-  document.getElementById("pdfAcValTh").textContent = result.ac;
-  document.getElementById("pdfReValTh").textContent = result.re;
-
-  let decisionEng, decisionTh, bgColor;
-  if (result.defects <= result.ac) {
-    decisionEng = "✅ ACCEPT";
-    decisionTh = "✅ ยอมรับ";
-    bgColor = "#22c55e";
-  } else if (result.defects >= result.re) {
-    decisionEng = "❌ REJECT";
-    decisionTh = "❌ ปฏิเสธ";
-    bgColor = "#ef4444";
-  } else {
-    decisionEng = "⚠️ BETWEEN";
-    decisionTh = "⚠️ สงสัย";
-    bgColor = "#f59e0b";
-  }
-
-  const decEng = document.getElementById("pdfDecisionEng");
-  const decTh = document.getElementById("pdfDecisionTh");
-  decEng.textContent = decisionEng + "\n(Defects: " + result.defects + " | Ac: " + result.ac + " | Re: " + result.re + ")";
-  decEng.style.backgroundColor = bgColor;
-  decEng.style.color = "#fff";
-  
-  decTh.textContent = decisionTh + "\n(ตำหนิ: " + result.defects + " | Ac: " + result.ac + " | Re: " + result.re + ")";
-  decTh.style.backgroundColor = bgColor;
-  decTh.style.color = "#fff";
-
-  document.getElementById("pdfCompanyName").textContent = result.company || "AQL Report";
-  document.getElementById("pdfCompanyThai").textContent = result.company || "รายงาน AQL";
-  document.getElementById("pdfFooter").textContent = "Generated: " + new Date().toLocaleString('en-US') + " | ANSI/ASQ Z1.4 - ISO 2859-1:2023";
-}
-
-async function exportPDF() {
+async function exportDashboardPDF() {
   if (!lastResult) {
     toast("No result to export","error");
     return;
   }
 
   try {
-    toast("Generating PDF...","success");
+    toast("Generating report...","success");
     
-    fillPdfContent(lastResult);
-    
-    const element = document.getElementById('pdfContent');
-    const opt = {
-      margin: 5,
-      filename: `AQL_Report_${lastResult.lot}_${new Date().toISOString().slice(0,10)}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    };
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
 
-    await html2pdf().set(opt).from(element).save();
-    toast(`PDF exported!`,"success");
+    let yPos = 15;
+    const pageHeight = pdf.internal.pageSize.height;
+    const fontSize = 10;
+
+    // Header
+    pdf.setFontSize(16);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFont(undefined, 'bold');
+    pdf.text("AQL Sampling Inspection Report", 105, yPos, { align: 'center' });
+    
+    yPos += 8;
+    pdf.setFontSize(14);
+    pdf.setTextColor(0, 68, 153);
+    pdf.text(lastResult.company || "Quality Control", 105, yPos, { align: 'center' });
+    
+    yPos += 6;
+    pdf.setFontSize(9);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFont(undefined, 'normal');
+    pdf.text("ANSI/ASQ Z1.4 - ISO 2859-1:2023", 105, yPos, { align: 'center' });
+    
+    yPos += 12;
+    pdf.setDrawColor(0, 51, 102);
+    pdf.line(10, yPos - 2, 200, yPos - 2);
+    yPos += 8;
+
+    // Section 1: Inspection Information
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFont(undefined, 'bold');
+    pdf.text("INSPECTION INFORMATION", 15, yPos);
+    yPos += 8;
+    
+    pdf.setFont(undefined, 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9);
+
+    const infoData = [
+      ["Company:", lastResult.company || "N/A"],
+      ["Date:", new Date().toLocaleDateString('th-TH')],
+      ["Time:", new Date().toLocaleTimeString('th-TH')],
+      ["Inspector:", lastResult.inspector || "N/A"],
+      ["Department:", lastResult.department || "QC"],
+      ["Product:", lastResult.product || "Unnamed"]
+    ];
+
+    infoData.forEach(([label, value]) => {
+      pdf.setFont(undefined, 'bold');
+      pdf.text(label, 15, yPos);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(value, 70, yPos);
+      yPos += 6;
+    });
+
+    yPos += 4;
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(10, yPos, 200, yPos);
+    yPos += 8;
+
+    // Section 2: Sampling Plan
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFont(undefined, 'bold');
+    pdf.text("SAMPLING PLAN", 15, yPos);
+    yPos += 8;
+    
+    pdf.setFont(undefined, 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9);
+
+    const planData = [
+      ["AQL Level:", lastResult.aql],
+      ["Inspection Level:", `Level ${lastResult.level}`],
+      ["Lot Size:", lastResult.lot.toString()],
+      ["Sample Size:", lastResult.ss.toString()],
+      ["Accept (Ac):", lastResult.ac.toString()],
+      ["Reject (Re):", lastResult.re.toString()]
+    ];
+
+    planData.forEach(([label, value]) => {
+      pdf.setFont(undefined, 'bold');
+      pdf.text(label, 15, yPos);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(value, 70, yPos);
+      yPos += 6;
+    });
+
+    yPos += 4;
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(10, yPos, 200, yPos);
+    yPos += 8;
+
+    // Section 3: Inspection Results
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFont(undefined, 'bold');
+    pdf.text("INSPECTION RESULTS", 15, yPos);
+    yPos += 8;
+    
+    pdf.setFont(undefined, 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9);
+
+    const resultData = [
+      ["Samples Inspected:", `${lastResult.ss} pieces`],
+      ["Defects Found:", `${lastResult.defects} pieces`],
+      ["Defect Rate:", `${((lastResult.defects / lastResult.ss * 100).toFixed(1))}%`]
+    ];
+
+    resultData.forEach(([label, value]) => {
+      pdf.setFont(undefined, 'bold');
+      pdf.text(label, 15, yPos);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(value, 70, yPos);
+      yPos += 6;
+    });
+
+    yPos += 6;
+
+    // Decision Box
+    let decisionText, bgColor, textColor;
+    if (lastResult.defects <= lastResult.ac) {
+      decisionText = `ACCEPT ✓\nDefects ${lastResult.defects} ≤ Ac ${lastResult.ac}`;
+      bgColor = [34, 197, 94];
+    } else if (lastResult.defects >= lastResult.re) {
+      decisionText = `REJECT ✗\nDefects ${lastResult.defects} ≥ Re ${lastResult.re}`;
+      bgColor = [239, 68, 68];
+    } else {
+      decisionText = `BETWEEN ⚠\n${lastResult.ac} < Defects ${lastResult.defects} < ${lastResult.re}`;
+      bgColor = [245, 158, 11];
+    }
+
+    pdf.setFillColor(...bgColor);
+    pdf.rect(15, yPos, 180, 18, 'F');
+    
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(12);
+    pdf.setFont(undefined, 'bold');
+    pdf.text("DECISION", 105, yPos + 5, { align: 'center' });
+    
+    pdf.setFontSize(10);
+    pdf.setFont(undefined, 'normal');
+    pdf.text(decisionText.split('\n')[0], 105, yPos + 10, { align: 'center' });
+    pdf.text(decisionText.split('\n')[1], 105, yPos + 14, { align: 'center' });
+
+    // Footer
+    pdf.setTextColor(150, 150, 150);
+    pdf.setFontSize(8);
+    pdf.text(`Generated: ${new Date().toLocaleString('th-TH')} | ANSI/ASQ Z1.4 - ISO 2859-1:2023`, 105, pageHeight - 10, { align: 'center' });
+
+    // Save PDF
+    pdf.save(`AQL_Report_${lastResult.lot}_${new Date().toISOString().slice(0,10)}.pdf`);
+    
+    toast("PDF exported!","success");
 
   } catch (err) {
     console.error("PDF error:", err);
@@ -1248,19 +1232,58 @@ function exportRecordPDF(id) {
 
   try {
     toast("Generating PDF...","success");
-    fillPdfContent(record);
 
-    const element = document.getElementById('pdfContent');
-    const opt = {
-      margin: 5,
-      filename: `AQL_Report_${record.lot}_${record.timestamp.replace(/\//g, '-').slice(0, 10)}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    };
+    const reportHTML = `
+      <div style="color: #333;">
+        <div style="text-align: center; border-bottom: 3px solid #003366; padding-bottom: 15px; margin-bottom: 20px;">
+          <h1 style="color: #003366; margin: 0; font-size: 24px;">${record.company}</h1>
+          <h2 style="color: #004499; margin: 5px 0; font-size: 18px;">AQL Sampling Inspection Report</h2>
+        </div>
 
-    html2pdf().set(opt).from(element).save();
-    toast(`PDF saved!`,"success");
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <tr><td style="font-weight: bold; width: 30%;">Date:</td><td>${record.timestamp}</td></tr>
+          <tr><td style="font-weight: bold;">Inspector:</td><td>${record.inspector}</td></tr>
+          <tr><td style="font-weight: bold;">Product:</td><td>${record.product}</td></tr>
+          <tr><td style="font-weight: bold;">AQL:</td><td>${record.aql}</td></tr>
+          <tr><td style="font-weight: bold;">Lot Size:</td><td>${record.lot}</td></tr>
+          <tr><td style="font-weight: bold;">Sample Size:</td><td>${record.ss}</td></tr>
+          <tr><td style="font-weight: bold;">Defects:</td><td>${record.defects}</td></tr>
+          <tr><td style="font-weight: bold;">Accept (Ac):</td><td>${record.ac}</td></tr>
+          <tr><td style="font-weight: bold;">Reject (Re):</td><td>${record.re}</td></tr>
+        </table>
+
+        <div style="text-align: center; padding: 15px; border-radius: 8px; background: ${record.decision === 'ACCEPT' ? '#22c55e' : record.decision === 'REJECT' ? '#ef4444' : '#f59e0b'}; color: white; font-weight: bold; font-size: 18px;">
+          ${record.decision}
+        </div>
+
+        <p style="margin-top: 20px; color: #999; font-size: 11px; text-align: center;">
+          ${record.timestamp}
+        </p>
+      </div>
+    `;
+
+    document.getElementById("reportCapture").innerHTML = reportHTML;
+
+    html2canvas(document.getElementById("reportCapture"), {
+      scale: 2,
+      backgroundColor: '#ffffff'
+    }).then(canvas => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`AQL_Report_${record.lot}_${record.timestamp.replace(/\//g, '-').slice(0, 10)}.pdf`);
+
+      toast("PDF saved!","success");
+    });
 
   } catch (err) {
     console.error("Export error:", err);
