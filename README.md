@@ -50,9 +50,7 @@ Prototype / MVP
 
 ## Screenshots
 
-Add QC / AQL dashboard screenshots here after UI review.
-
-Suggested path: docs/screenshots/aql-sampling-dashboard.png
+![AQL Sampling Dashboard](assets/screenshots/dashboard.png)
 
 ## Standards Reference
 
